@@ -1,31 +1,37 @@
 ---
 name: ghost-decode
-description: Use when a video hides text in moving dots or noise — "ghost font" clips, motion-defined text, random-dot kinematograms, TV-static videos with a secret message, text readable only while playing but invisible in any paused frame, or the user asks what a ghost-font video says.
-argument-hint: "[video-path]"
+description: Decode videos that hide text in moving dots or noise using dense optical flow and optional OCR. Use for ghost-font clips, motion-defined text, random-dot kinematograms, TV-static videos with secret messages, text visible only during playback, or requests asking what a ghost-font video says.
 ---
 
 # Ghost-Font Video Decoder
 
-Ghost-font videos hide a message as a random-dot field: every frame is uniform noise, but dots inside the letter shapes move against the background dots. The bundled decoder recovers the message from dense optical flow.
+Recover motion-defined text with the decoder bundled at the plugin root.
 
-## Steps
+## Workflow
 
-1. Resolve the video path: use `$ARGUMENTS` or the path in the user's request. If none given, look for a recently modified video file (`.mp4`, `.mov`, `.avi`, `.webm`) in the working directory.
-2. Check dependencies: `python -c "import cv2, numpy"`. If that fails, run `pip install -r "${CLAUDE_PLUGIN_ROOT}/requirements.txt"`.
-3. Run the decoder (writes `revealed.png` and `revealed_heatmap.png` to the output dir, creating it if needed — use a scratch dir unless the user wants them in the project):
+1. Resolve the input video from the user's request. If no path is supplied, search the working directory for a recently modified `.mp4`, `.mov`, `.avi`, or `.webm` file. Ask only if more than one candidate is plausible.
+2. Determine `<plugin-root>` from this skill's installed location. This file is at `<plugin-root>/skills/ghost-decode/SKILL.md`; do not assume the plugin is installed in or invoked from the current working directory.
+3. Check the runtime with:
 
+   ```text
+   python -c "import cv2, numpy"
    ```
-   python "${CLAUDE_PLUGIN_ROOT}/decode.py" "<video-path>" -o "<output-dir>"
+
+   If imports fail, explain that the plugin needs the packages in `<plugin-root>/requirements.txt` and install them only with the user's approval when the environment requires approval.
+4. Create a scratch output directory unless the user requested a specific destination, then run:
+
+   ```text
+   python "<plugin-root>/decode.py" "<video-path>" -o "<output-dir>"
    ```
 
-   On Windows PowerShell the plugin root is `$env:CLAUDE_PLUGIN_ROOT` — if it expands empty, substitute the plugin's install path literally.
-4. If the output contains `Hidden message:`, Read `revealed.png` with vision to confirm the OCR matches the image, then report the text.
-5. If OCR was skipped (no Tesseract engine) or disagrees with the image, report what you see in `revealed.png`. The heatmap `revealed_heatmap.png` is a softer fallback view.
-6. Tell the user the hidden message and where the revealed images were saved.
+5. Inspect both generated files. Prefer `revealed.png`; use `revealed_heatmap.png` when the cleaned mask loses faint letter detail.
+6. If the command prints `Hidden message:`, visually verify the OCR result against the revealed image. If OCR is unavailable or disagrees with the image, read the image directly.
+7. Report the recovered text and the absolute paths of both output images. State uncertainty when any character is ambiguous.
 
 ## Troubleshooting
 
-- Weak or empty mask: retry with `--method farneback`; for high-fps clips also try `--stride 2`.
-- Very long video: add `--max-frames 200` — a few seconds of footage is enough.
-- OCR engine missing: the skill still works via step 5 (read the image visually). Installing Tesseract (`winget install UB-Mannheim.TesseractOCR`) enables automatic text extraction.
-- No text found at all: the clip may not be a ghost-font video — check `revealed_heatmap.png`; if it is uniformly dark there is no coherent counter-motion to decode.
+- Retry a weak or empty mask with `--method farneback`.
+- Try `--stride 2` for high-frame-rate clips.
+- Add `--max-frames 200` for long videos; a few seconds is usually enough.
+- Continue with visual inspection when Tesseract is unavailable. Installing Tesseract is optional.
+- Treat a uniformly dark heatmap as evidence that the clip may not contain coherent counter-motion.

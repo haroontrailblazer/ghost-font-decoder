@@ -1,69 +1,90 @@
-# Ghost Font Decoder — Claude Code plugin
+# Ghost Font Decoder — Codex and Claude Code plugin
 
-"Ghost font" videos hide text as a random-dot field: every single frame is
-uniform noise, but the dots inside the letter shapes drift against the
-background dots, so the message is only visible while the video plays.
-Pause it — or feed frames to an AI one by one — and there is nothing to read.
+"Ghost font" videos hide text in a random-dot field. A paused frame looks like
+uniform noise, but dots inside the letter shapes move against the background,
+making the message visible only during playback.
 
-The trick has one weakness: the message *is* the motion. This plugin gives
-Claude Code a skill that reads the motion directly with dense optical flow
-and tells you what the video says.
+This repository packages a `ghost-decode` skill for Codex and Claude Code. Its
+Python decoder reads the motion with dense optical flow, compensates for glyph
+drift, produces a clean reveal, and optionally runs OCR.
 
 ![Revealed message](examples/revealed.png)
 
-## Install (Claude Code)
+## Use with Codex
 
-```
+The repository is a Codex plugin root:
+
+- `.codex-plugin/plugin.json` contains the Codex plugin manifest and UI metadata.
+- `skills/ghost-decode/SKILL.md` contains the skill workflow.
+- `skills/ghost-decode/agents/openai.yaml` contains the skill's Codex UI metadata.
+
+Add this repository as a local plugin source in a Codex marketplace, install
+`ghost-font-decoder`, and start a new task so Codex loads the skill. Then ask:
+
+> Use $ghost-decode to tell me what ghost-video.mp4 says.
+
+Codex runs the bundled decoder, checks the revealed mask, and reports the hidden
+text.
+
+## Use with Claude Code
+
+Claude Code compatibility is retained through `.claude-plugin`:
+
+```text
 /plugin marketplace add haroontrailblazer/ghost-font-decoder
 /plugin install ghost-font-decoder@ghost-font-tools
 ```
 
-Then just ask, in any session:
+Then ask:
 
-> what does ghost-video.mp4 say?
+> What does ghost-video.mp4 say?
 
-or invoke it directly:
+or invoke the skill directly:
 
-```
+```text
 /ghost-decode path/to/video.mp4
 ```
 
-Claude runs the bundled decoder, OCRs the revealed mask (or reads it with
-vision if Tesseract isn't installed), and replies with the hidden text.
+## Requirements
 
-**Requirements:** Python 3 with `opencv-python` and `numpy`
-(`pip install -r requirements.txt` — Claude offers to do this for you).
-Optional: the Tesseract engine (`winget install UB-Mannheim.TesseractOCR`)
-for automatic OCR.
+Install Python 3 dependencies with:
 
-## Standalone use (no Claude)
-
-```
+```text
 pip install -r requirements.txt
+```
+
+Tesseract is optional. On Windows it can be installed with:
+
+```text
+winget install UB-Mannheim.TesseractOCR
+```
+
+Without Tesseract, the plugin still produces images that Codex or Claude can
+inspect visually.
+
+## Standalone use
+
+```text
 python decode.py examples/ghost-message.mp4
 ```
 
-Outputs `revealed_heatmap.png` (raw opposition score), `revealed.png` (clean
-binary mask), and prints the OCR'd hidden message. Options: `-o OUT_DIR`,
-`--method {dis,farneback}`, `--stride N`, `--max-frames N`, `--no-ocr`.
+The command writes:
+
+- `revealed_heatmap.png` — raw opposition score
+- `revealed.png` — cleaned binary mask
+
+Useful options:
+
+```text
+python decode.py VIDEO -o OUT_DIR --method farneback --stride 2 --max-frames 200 --no-ocr
+```
 
 ## How it works
 
-1. **Dense optical flow** between consecutive frames (OpenCV DIS, or
-   Farnebäck via `--method farneback`).
-2. **Background subtraction**: the per-pair median flow is the background
-   motion (the background dominates the frame area). Each pixel is scored by
-   how strongly its residual flow points *against* the background.
-3. **Drift registration**: the glyph region itself drifts slowly even though
-   the dots inside it stream fast, so each pair's score map is aligned to the
-   first frame via phase correlation before accumulating — otherwise the
-   letters smear.
-4. **Accumulation + cleanup**: scores summed over all frame pairs, Otsu
-   threshold, morphological cleanup, small-component removal.
-5. **OCR** (optional): Tesseract reads the revealed mask.
+1. Compute dense optical flow between consecutive frames.
+2. Subtract median background flow and score counter-moving pixels.
+3. Register the drifting glyph region with phase correlation.
+4. Accumulate scores, threshold them, and clean the mask.
+5. Run optional Tesseract OCR and verify the result against the reveal.
 
-## Demo
-
-`examples/ghost-message.mp4` is a real ghost-font clip. OCR on any paused
-frame returns gibberish; `python decode.py examples/ghost-message.mp4`
-prints `HELLO HUMAN`.
+The included example decodes to `HELLO HUMAN`.

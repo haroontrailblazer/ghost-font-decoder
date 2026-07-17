@@ -1,0 +1,42 @@
+{
+  "name": "ghost-font-decoder",
+  "version": "1.0.0",
+  "description": "Reveal text hidden in ghost-font videos and motion-defined random-dot clips using optical flow and OCR.",
+  "author": {
+    "name": "baskaran",
+    "email": "baskaran@closefuture.io",
+    "url": "https://github.com/haroontrailblazer"
+  },
+  "homepage": "https://github.com/haroontrailblazer/ghost-font-decoder",
+  "repository": "https://github.com/haroontrailblazer/ghost-font-decoder",
+  "license": "MIT",
+  "keywords": [
+    "ghost-font",
+    "hidden-text",
+    "optical-flow",
+    "video",
+    "ocr",
+    "kinematogram",
+    "steganography"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Ghost Font Decoder",
+    "shortDescription": "Reveal motion-hidden text in noisy videos",
+    "longDescription": "Decode text that is invisible in paused frames but appears through counter-moving dots or noise. The plugin uses dense optical flow, drift compensation, image cleanup, and optional OCR.",
+    "developerName": "baskaran",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/haroontrailblazer/ghost-font-decoder",
+    "defaultPrompt": [
+      "Decode the hidden message in this ghost-font video.",
+      "Check this noisy video for motion-defined text."
+    ],
+    "brandColor": "#171717",
+    "screenshots": []
+  }
+}
