@@ -1,0 +1,20 @@
+{
+  "name": "ghost-font-tools",
+  "description": "Tools for decoding motion-hidden text in videos",
+  "owner": {
+    "name": "baskaran",
+    "email": "baskaran@closefuture.io"
+  },
+  "plugins": [
+    {
+      "name": "ghost-font-decoder",
+      "source": "./",
+      "description": "Reveal text hidden in ghost-font videos (motion-defined dot text) using optical flow and OCR",
+      "version": "1.0.0",
+      "license": "MIT",
+      "author": {
+        "name": "baskaran"
+      }
+    }
+  ]
+}

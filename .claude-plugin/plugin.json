@@ -1,0 +1,12 @@
+{
+  "name": "ghost-font-decoder",
+  "displayName": "Ghost Font Decoder",
+  "version": "1.0.0",
+  "description": "Reveal text hidden in ghost-font videos (motion-defined dot text) using optical flow and OCR",
+  "author": {
+    "name": "baskaran",
+    "email": "baskaran@closefuture.io"
+  },
+  "license": "MIT",
+  "keywords": ["ghost-font", "hidden-text", "optical-flow", "video", "ocr", "kinematogram", "steganography"]
+}
