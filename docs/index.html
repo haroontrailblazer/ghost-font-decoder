@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ghost Font Decoder — No more ghosting</title>
+<meta name="description" content="Ghost fonts hide text from AI agents. The Ghost Font Decoder skill gives your agent optical flow, so it reads what ghost fonts hide.">
+<style>
+  :root {
+    --bg: #0b0d10;
+    --bg-raise: #14171c;
+    --border: #262b33;
+    --text: #e8eaed;
+    --muted: #9aa3ad;
+    --accent: #4fd1a5;
+    --accent-dark: #2e8f70;
+    --danger: #e06c75;
+    --max: 980px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .wrap { max-width: var(--max); margin: 0 auto; padding: 0 24px; }
+
+  header.site {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 24px; max-width: var(--max); margin: 0 auto;
+  }
+  .brand { font-weight: 700; letter-spacing: 0.02em; color: var(--text); }
+  .brand span { color: var(--accent); }
+  nav.top a { color: var(--muted); margin-left: 22px; font-size: 0.95rem; }
+  nav.top a:hover { color: var(--text); text-decoration: none; }
+
+  .hero { text-align: center; padding: 56px 0 28px; }
+  .hero h1 {
+    font-size: clamp(2.4rem, 6vw, 4rem);
+    line-height: 1.1; letter-spacing: -0.02em; font-weight: 800;
+  }
+  .hero h1 em { font-style: normal; color: var(--accent); }
+  .hero p.sub {
+    margin: 20px auto 0; max-width: 640px; color: var(--muted);
+    font-size: 1.1rem;
+  }
+  .hero p.sub strong { color: var(--text); }
+
+  .demo { margin: 36px auto 0; }
+  .demo-frame {
+    background: var(--bg-raise); border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden;
+  }
+  #ghost { display: block; width: 100%; height: auto; cursor: pointer; }
+  .demo-bar {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+    padding: 12px 14px; border-top: 1px solid var(--border);
+  }
+  .demo-bar input[type="text"] {
+    flex: 1 1 200px; min-width: 0;
+    background: var(--bg); color: var(--text);
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: 9px 12px; font-size: 0.95rem; text-transform: uppercase;
+  }
+  .demo-bar input[type="text"]:focus { outline: 1px solid var(--accent-dark); }
+  .btn {
+    display: inline-block; border: 1px solid var(--border); border-radius: 8px;
+    background: var(--bg); color: var(--text); padding: 9px 16px;
+    font-size: 0.95rem; cursor: pointer; white-space: nowrap;
+  }
+  .btn:hover { border-color: var(--accent-dark); text-decoration: none; }
+  .btn.primary {
+    background: var(--accent); border-color: var(--accent); color: #05261b;
+    font-weight: 600;
+  }
+  .btn.primary:hover { background: #63dbb2; }
+  .btn.active { border-color: var(--accent); color: var(--accent); }
+  .demo-hint { text-align: center; color: var(--muted); font-size: 0.92rem; margin-top: 12px; }
+  .demo-hint b { color: var(--text); font-weight: 600; }
+  #stateLabel { color: var(--accent); font-weight: 600; }
+  #stateLabel.paused { color: var(--danger); }
+
+  section.block { padding: 64px 0 8px; }
+  section.block h2 {
+    font-size: 1.7rem; letter-spacing: -0.01em; margin-bottom: 14px;
+  }
+  section.block > .wrap > p { color: var(--muted); max-width: 720px; }
+  section.block p b, section.block p strong { color: var(--text); }
+
+  .cards {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 14px; margin-top: 26px;
+  }
+  .card {
+    background: var(--bg-raise); border: 1px solid var(--border);
+    border-radius: 12px; padding: 18px;
+  }
+  .card .step { color: var(--accent); font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; }
+  .card h3 { font-size: 1.02rem; margin: 6px 0 6px; }
+  .card p { color: var(--muted); font-size: 0.92rem; }
+
+  .shots { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 26px; }
+  .shot { background: var(--bg-raise); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .shot img { display: block; width: 100%; height: auto; }
+  .shot figcaption { padding: 10px 14px; color: var(--muted); font-size: 0.9rem; border-top: 1px solid var(--border); }
+  .shot figcaption b { color: var(--text); }
+  @media (max-width: 640px) { .shots { grid-template-columns: 1fr; } }
+
+  .installs { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-top: 26px; }
+  .install {
+    background: var(--bg-raise); border: 1px solid var(--border);
+    border-radius: 12px; padding: 18px;
+  }
+  .install h3 { font-size: 1.02rem; margin-bottom: 10px; }
+  pre {
+    background: #0a0c0f; border: 1px solid var(--border); border-radius: 8px;
+    padding: 12px 14px; overflow-x: auto; font-size: 0.85rem; line-height: 1.55;
+    color: #cdd6df;
+  }
+  pre .c { color: #5f6b76; }
+  .install p { color: var(--muted); font-size: 0.9rem; margin-top: 10px; }
+
+  .banner {
+    margin: 72px 0 0; padding: 56px 0; text-align: center;
+    background: var(--bg-raise); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+  }
+  .banner h2 { font-size: clamp(1.6rem, 4vw, 2.4rem); letter-spacing: -0.01em; }
+  .banner h2 em { font-style: normal; color: var(--accent); }
+  .banner p { color: var(--muted); max-width: 620px; margin: 14px auto 24px; }
+  .banner p strong { color: var(--text); }
+
+  footer.site {
+    padding: 32px 24px 44px; text-align: center; color: var(--muted); font-size: 0.9rem;
+  }
+  footer.site a { color: var(--muted); text-decoration: underline; }
+  footer.site a:hover { color: var(--text); }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="brand">Ghost Font <span>Decoder</span></div>
+  <nav class="top">
+    <a href="#how">How it works</a>
+    <a href="#install">Install</a>
+    <a href="https://github.com/haroontrailblazer/ghost-font-decoder">GitHub</a>
+  </nav>
+</header>
+
+<section class="hero wrap">
+  <h1>Your agent.<br><em>No more ghosting.</em></h1>
+  <p class="sub">
+    Ghost fonts hide text in moving dots — humans read it in motion, but every
+    single frame is pure noise, so AI agents that read video frame by frame see
+    <strong>nothing</strong>. The Ghost Font Decoder skill gives your agent
+    optical flow. <strong>Install it, and your agent reads what ghost fonts hide.</strong>
+  </p>
+
+  <div class="demo">
+    <div class="demo-frame">
+      <canvas id="ghost" width="960" height="320" aria-label="Live ghost font demo: moving dots that spell a message"></canvas>
+      <div class="demo-bar">
+        <input type="text" id="msg" maxlength="14" value="HELLO HUMAN" aria-label="Demo message">
+        <button class="btn" id="apply">Set text</button>
+        <button class="btn primary" id="toggle">Pause</button>
+        <button class="btn" id="reveal">Decoder view</button>
+      </div>
+    </div>
+    <p class="demo-hint">
+      This is a live ghost font — state: <span id="stateLabel">playing</span>.
+      <b>Playing</b>, you read it. <b>Paused</b>, every frame is noise: that is
+      all a frame-by-frame AI ever sees. <b>Decoder view</b> shows what the
+      skill recovers from motion.
+    </p>
+  </div>
+</section>
+
+<section class="block" id="what">
+  <div class="wrap">
+    <h2>What is a ghost font?</h2>
+    <p>
+      A ghost font renders a message as a field of random dots. Dots inside the
+      letter shapes drift in one direction while the background dots drift in
+      another. Human vision segments the two motions instantly, so the text pops
+      out during playback — but pause the video and the letters vanish, because
+      no individual frame contains any difference between text and background.
+      Screenshots, frame extraction, and OCR all come back empty. It is being
+      used as an anti-AI watermark: content agents cannot read, summarize, or act on.
+    </p>
+  </div>
+</section>
+
+<section class="block" id="how">
+  <div class="wrap">
+    <h2>How the decoder breaks it</h2>
+    <p>
+      The trick has one weakness: <b>the message is the motion</b>. The decoder
+      reads the motion directly instead of the frames.
+    </p>
+    <div class="cards">
+      <div class="card">
+        <div class="step">STEP 1</div>
+        <h3>Dense optical flow</h3>
+        <p>Computes a motion vector for every pixel between consecutive frames (OpenCV DIS or Farnebäck).</p>
+      </div>
+      <div class="card">
+        <div class="step">STEP 2</div>
+        <h3>Background subtraction</h3>
+        <p>The median flow is the background motion. Pixels moving against it score as candidate text.</p>
+      </div>
+      <div class="card">
+        <div class="step">STEP 3</div>
+        <h3>Drift registration</h3>
+        <p>Phase correlation aligns each score map, so slowly drifting glyphs stack sharply instead of smearing.</p>
+      </div>
+      <div class="card">
+        <div class="step">STEP 4</div>
+        <h3>Accumulate and read</h3>
+        <p>Scores sum over hundreds of frame pairs, noise cancels, letters remain — then OCR reads them out.</p>
+      </div>
+    </div>
+
+    <div class="shots">
+      <figure class="shot">
+        <img src="assets/paused-frame.png" alt="A single paused frame: uniform random dots, no visible text">
+        <figcaption><b>Input:</b> any paused frame. Uniform noise — OCR returns gibberish.</figcaption>
+      </figure>
+      <figure class="shot">
+        <img src="assets/revealed.png" alt="Decoder output: the words HELLO HUMAN in white on black">
+        <figcaption><b>Output:</b> the decoder's revealed mask. OCR reads HELLO HUMAN.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="install">
+  <div class="wrap">
+    <h2>Give your agent the skill</h2>
+    <p>One repository, two plugins — each tool loads a skill written for its own conventions.</p>
+    <div class="installs">
+      <div class="install">
+        <h3>Claude Code</h3>
+<pre>/plugin marketplace add haroontrailblazer/ghost-font-decoder
+/plugin install ghost-font-decoder@ghost-font-tools</pre>
+        <p>Then ask: “what does ghost-video.mp4 say?” — or run <code>/ghost-decode video.mp4</code>.</p>
+      </div>
+      <div class="install">
+        <h3>Codex</h3>
+<pre><span class="c"># add the repo as a plugin source, install</span>
+<span class="c"># ghost-font-decoder, then in a new task:</span>
+Use $ghost-decode to tell me what
+ghost-video.mp4 says.</pre>
+        <p>The Codex skill ships with its own manifest and UI metadata.</p>
+      </div>
+      <div class="install">
+        <h3>Plain Python</h3>
+<pre>pip install -r requirements.txt
+python decode.py examples/ghost-message.mp4</pre>
+        <p>No AI required — prints the hidden message and writes the revealed images.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="banner">
+  <div class="wrap">
+    <h2>Ghost fonts hide text from your agent.<br><em>This skill takes it back.</em></h2>
+    <p>
+      Free, open source, MIT licensed. Works with Claude Code, Codex, or
+      standalone Python. <strong>Your agent — no more ghosting.</strong>
+    </p>
+    <a class="btn primary" href="https://github.com/haroontrailblazer/ghost-font-decoder">Get it on GitHub</a>
+  </div>
+</div>
+
+<footer class="site">
+  Built by <a href="https://github.com/haroontrailblazer">Haroon K M (@haroontrailblazer)</a>
+  · MIT License ·
+  <a href="https://github.com/haroontrailblazer/ghost-font-decoder">Source on GitHub</a>
+</footer>
+
+<script>
+(function () {
+  const canvas = document.getElementById('ghost');
+  const ctx = canvas.getContext('2d');
+  const input = document.getElementById('msg');
+  const applyBtn = document.getElementById('apply');
+  const toggleBtn = document.getElementById('toggle');
+  const revealBtn = document.getElementById('reveal');
+  const stateLabel = document.getElementById('stateLabel');
+
+  const W = canvas.width, H = canvas.height;
+  const DOT = 2.4;          // dot size in canvas units
+  const SPEED = 1.1;        // px per frame
+  const N = Math.floor((W * H) / 48);
+
+  let mask = null;          // Uint8ClampedArray alpha of rendered text
+  let dots = [];
+  let playing = true;
+  let reveal = false;
+  let raf = null;
+
+  function buildMask(text) {
+    const m = document.createElement('canvas');
+    m.width = W; m.height = H;
+    const mc = m.getContext('2d');
+    mc.clearRect(0, 0, W, H);
+    mc.fillStyle = '#fff';
+    let size = 170;
+    mc.textAlign = 'center';
+    mc.textBaseline = 'middle';
+    do {
+      mc.font = '800 ' + size + 'px -apple-system, "Segoe UI", Roboto, Arial, sans-serif';
+      size -= 6;
+    } while (mc.measureText(text).width > W * 0.9 && size > 20);
+    mc.fillText(text, W / 2, H / 2);
+    mask = mc.getImageData(0, 0, W, H).data;
+  }
+
+  function inText(x, y) {
+    const xi = x | 0, yi = y | 0;
+    if (xi < 0 || yi < 0 || xi >= W || yi >= H) return false;
+    return mask[(yi * W + xi) * 4 + 3] > 128;
+  }
+
+  function seed() {
+    dots = [];
+    for (let i = 0; i < N; i++) {
+      dots.push({ x: Math.random() * W, y: Math.random() * H });
+    }
+  }
+
+  function frame() {
+    ctx.fillStyle = '#0a0c0f';
+    ctx.fillRect(0, 0, W, H);
+    for (const d of dots) {
+      const t = inText(d.x, d.y);
+      if (playing) {
+        d.x += t ? -SPEED : SPEED;
+        if (d.x < 0) d.x += W;
+        if (d.x >= W) d.x -= W;
+      }
+      ctx.fillStyle = (reveal && t) ? '#4fd1a5' : '#cdd6df';
+      ctx.fillRect(d.x, d.y, DOT, DOT);
+    }
+    raf = playing ? requestAnimationFrame(frame) : null;
+  }
+
+  function setPlaying(p) {
+    playing = p;
+    toggleBtn.textContent = playing ? 'Pause' : 'Play';
+    stateLabel.textContent = playing ? 'playing' : 'paused';
+    stateLabel.classList.toggle('paused', !playing);
+    if (playing && raf === null) raf = requestAnimationFrame(frame);
+    if (!playing) frame();
+  }
+
+  applyBtn.addEventListener('click', () => {
+    const t = (input.value || 'HELLO HUMAN').toUpperCase().trim() || 'HELLO HUMAN';
+    input.value = t;
+    buildMask(t);
+  });
+  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') applyBtn.click(); });
+  toggleBtn.addEventListener('click', () => setPlaying(!playing));
+  canvas.addEventListener('click', () => setPlaying(!playing));
+  revealBtn.addEventListener('click', () => {
+    reveal = !reveal;
+    revealBtn.classList.toggle('active', reveal);
+    if (!playing) frame();
+  });
+
+  buildMask('HELLO HUMAN');
+  seed();
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    setPlaying(false);
+  } else {
+    raf = requestAnimationFrame(frame);
+  }
+})();
+</script>
+
+</body>
+</html>
