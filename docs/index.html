@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ghost Font Decoder — the text they said AI can't read</title>
-<meta name="description" content="Ghost fonts are marketed as text AI cannot read. The Ghost Font Decoder skill breaks through it easily — install it and your agent reads what ghost fonts hide.">
+<meta name="description" content="Ghost fonts are marketed as text AI cannot read. The Ghost Font Decoder skill breaks through it easily — press decode and watch the hidden message appear.">
 <style>
   :root {
     --bg: #ffffff;
-    --bg-soft: #f6f6f4;
-    --ink: #111111;
-    --muted: #6b6b6b;
-    --line: #e6e6e3;
+    --bg-soft: #f5f5f3;
+    --ink: #0a0a0a;
+    --muted: #6f6f6f;
+    --line: #e7e7e4;
     --accent: #12a67a;
     --max: 760px;
     --wide: 1120px;
@@ -21,89 +21,63 @@
   html { scroll-behavior: smooth; }
   body {
     background: var(--bg); color: var(--ink);
-    font-family: var(--sans); line-height: 1.65;
-    -webkit-font-smoothing: antialiased; font-size: 16px;
+    font-family: var(--sans); line-height: 1.65; font-size: 16px;
+    -webkit-font-smoothing: antialiased;
   }
   a { color: inherit; }
   .wrap { max-width: var(--max); margin: 0 auto; padding: 0 24px; }
-  .wide { max-width: var(--wide); margin: 0 auto; padding: 0 24px; }
 
-  /* nav */
   header.nav {
     border-bottom: 1px solid var(--line);
-    position: sticky; top: 0; background: rgba(255,255,255,0.92);
-    backdrop-filter: saturate(180%) blur(8px); z-index: 20;
+    position: sticky; top: 0; z-index: 20;
+    background: rgba(255,255,255,0.92); backdrop-filter: saturate(180%) blur(8px);
   }
-  .nav-inner {
-    max-width: var(--wide); margin: 0 auto; padding: 16px 24px;
-    display: flex; align-items: center; justify-content: space-between;
-  }
+  .nav-inner { max-width: var(--wide); margin: 0 auto; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
   .logo { font-weight: 800; letter-spacing: -0.03em; font-size: 1.05rem; text-decoration: none; }
   .logo b { color: var(--accent); }
   .nav-links { display: flex; gap: 26px; align-items: center; }
   .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.9rem; }
   .nav-links a:hover { color: var(--ink); }
-  .nav-cta {
-    border: 1px solid var(--ink); border-radius: 6px; padding: 7px 14px;
-    color: var(--ink) !important; font-size: 0.85rem;
-  }
+  .nav-cta { border: 1px solid var(--ink); border-radius: 6px; padding: 7px 14px; color: var(--ink) !important; font-size: 0.85rem; }
   .nav-cta:hover { background: var(--ink); color: #fff !important; }
-  @media (max-width: 620px) { .nav-links a.hideable { display: none; } }
+  @media (max-width: 640px) { .nav-links a.hideable { display: none; } }
 
-  .crumb { color: var(--muted); font-size: 0.82rem; padding: 26px 0 0; text-align: center; }
+  .crumb { color: var(--muted); font-size: 0.82rem; padding: 30px 0 0; text-align: center; }
   .crumb a { text-decoration: none; }
   .crumb a:hover { text-decoration: underline; }
 
-  /* hero */
-  .hero { text-align: center; padding: 14px 0 8px; }
-  .hero h1 {
-    font-size: clamp(2.4rem, 6vw, 3.6rem); font-weight: 500;
-    letter-spacing: -0.03em; line-height: 1.05;
-  }
-  .hero .lede { color: var(--muted); max-width: 560px; margin: 18px auto 0; font-size: 1.02rem; }
+  .hero { text-align: center; padding: 16px 0 6px; }
+  .hero h1 { font-size: clamp(2.6rem, 6.5vw, 3.7rem); font-weight: 700; letter-spacing: -0.035em; line-height: 1.02; }
+  .hero .lede { color: var(--muted); max-width: 560px; margin: 20px auto 0; font-size: 1.03rem; }
   .hero .lede b { color: var(--ink); font-weight: 600; }
 
-  /* demo */
-  .demo { max-width: 880px; margin: 34px auto 0; padding: 0 24px; }
-  .stage { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: #000; }
-  #ghost { display: block; width: 100%; height: auto; cursor: pointer; }
-  .field { margin-top: 16px; }
-  .field label { display: block; font-size: 0.72rem; letter-spacing: 0.12em; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; }
-  .field input[type=text] {
-    width: 100%; border: 1px solid var(--line); border-radius: 8px;
-    padding: 12px 14px; font-size: 1rem; font-family: var(--sans);
-    text-transform: uppercase; color: var(--ink); background: #fff;
+  /* decode showcase */
+  .demo { max-width: 880px; margin: 36px auto 0; padding: 0 24px; }
+  .stage { position: relative; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: #ececea; }
+  #ghost { display: block; width: 100%; height: auto; }
+  .readout {
+    position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%);
+    background: rgba(10,10,10,0.86); color: #fff; font-size: 0.82rem;
+    padding: 7px 14px; border-radius: 999px; letter-spacing: 0.02em;
+    opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap;
   }
-  .field input[type=text]:focus { outline: none; border-color: var(--ink); }
-  .controls {
-    display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin-top: 14px;
-  }
-  .ctl {
-    border: 1px solid var(--line); background: #fff; border-radius: 6px;
-    padding: 8px 14px; font-size: 0.85rem; font-family: var(--sans);
-    cursor: pointer; color: var(--ink);
-  }
-  .ctl:hover { border-color: var(--ink); }
-  .ctl.on { border-color: var(--accent); color: var(--accent); }
-  .speed { display: flex; align-items: center; gap: 8px; font-size: 0.72rem; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; }
-  .speed input[type=range] { accent-color: var(--ink); }
-  .cta-row { text-align: center; margin-top: 20px; }
+  .readout.show { opacity: 1; }
+  .readout b { color: #4fe3b4; font-weight: 600; }
+  .actions { text-align: center; margin-top: 20px; }
   .btn-primary {
-    display: inline-block; background: var(--ink); color: #fff; text-decoration: none;
-    border-radius: 8px; padding: 12px 22px; font-size: 0.95rem; font-weight: 500;
-    border: 1px solid var(--ink);
+    display: inline-flex; align-items: center; gap: 9px;
+    background: var(--ink); color: #fff; text-decoration: none; cursor: pointer;
+    border: 1px solid var(--ink); border-radius: 8px; padding: 13px 26px;
+    font-size: 0.98rem; font-weight: 500; font-family: var(--sans);
   }
   .btn-primary:hover { background: #000; }
-  .state {
-    text-align: center; color: var(--muted); font-size: 0.86rem; margin-top: 14px;
-  }
-  .state b { color: var(--ink); }
-  #stateLabel { color: var(--accent); font-weight: 600; }
-  #stateLabel.paused { color: #c0392b; }
+  .btn-primary[disabled] { opacity: 0.55; cursor: default; }
+  .btn-primary .dot { width: 8px; height: 8px; border-radius: 50%; background: #4fe3b4; }
+  .subnote { color: var(--muted); font-size: 0.86rem; margin-top: 14px; text-align: center; }
+  .subnote b { color: var(--ink); }
 
-  /* content sections */
-  section.doc { padding: 60px 0 0; }
-  section.doc h2 { text-align: center; font-weight: 500; font-size: 1.9rem; letter-spacing: -0.02em; margin-bottom: 22px; }
+  section.doc { padding: 62px 0 0; }
+  section.doc h2 { text-align: center; font-weight: 700; font-size: 1.7rem; letter-spacing: -0.02em; margin-bottom: 22px; }
   section.doc p { color: #2a2a2a; margin: 0 auto 18px; max-width: 640px; }
   section.doc p b { color: var(--ink); }
 
@@ -112,7 +86,7 @@
   .shot img { display: block; width: 100%; height: auto; }
   .shot figcaption { padding: 11px 14px; font-size: 0.85rem; color: var(--muted); border-top: 1px solid var(--line); }
   .shot figcaption b { color: var(--ink); }
-  @media (max-width: 620px) { .shots { grid-template-columns: 1fr; } }
+  @media (max-width: 640px) { .shots { grid-template-columns: 1fr; } }
 
   .steps { max-width: 880px; margin: 28px auto 0; padding: 0 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
   .steps .cell { background: #fff; padding: 18px; }
@@ -120,10 +94,9 @@
   .steps .cell h4 { font-size: 0.98rem; font-weight: 600; margin: 6px 0 5px; }
   .steps .cell p { font-size: 0.88rem; color: var(--muted); margin: 0; }
 
-  /* callout (security-claim rebuttal) */
-  .callout { background: var(--bg-soft); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin-top: 64px; padding: 56px 0; }
+  .callout { background: var(--bg-soft); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin-top: 64px; padding: 58px 0; }
   .callout .tag { text-align: center; font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
-  .callout h2 { text-align: center; font-weight: 500; font-size: clamp(1.6rem, 4vw, 2.3rem); letter-spacing: -0.02em; margin: 10px auto 20px; max-width: 720px; }
+  .callout h2 { text-align: center; font-weight: 700; font-size: clamp(1.6rem, 4vw, 2.3rem); letter-spacing: -0.02em; margin: 10px auto 20px; max-width: 720px; }
   .callout h2 em { font-style: normal; color: var(--accent); }
   .callout p { color: #2a2a2a; max-width: 620px; margin: 0 auto 16px; }
   .callout p b { color: var(--ink); }
@@ -133,27 +106,21 @@
   .vcard h4 { font-size: 1.02rem; font-weight: 600; margin: 6px 0 6px; }
   .vcard p { font-size: 0.88rem; color: var(--muted); margin: 0; }
 
-  /* install */
-  .installs { max-width: 980px; margin: 28px auto 0; padding: 0 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 16px; }
+  .installs { max-width: 980px; margin: 28px auto 0; padding: 0 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
   .inst { border: 1px solid var(--line); border-radius: 10px; padding: 18px; }
   .inst h4 { font-size: 1rem; font-weight: 600; margin-bottom: 10px; }
   pre { background: #0e0f10; color: #e6e6e6; border-radius: 8px; padding: 12px 14px; overflow-x: auto; font-size: 0.8rem; line-height: 1.55; font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace; }
   pre .c { color: #7d8590; }
   .inst p { font-size: 0.86rem; color: var(--muted); margin-top: 10px; }
 
-  /* footer */
   footer.site { border-top: 1px solid var(--line); margin-top: 72px; padding: 48px 0 0; }
   .fcols { max-width: var(--wide); margin: 0 auto; padding: 0 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 28px; }
-  .fcol h5 { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
-  .fcol a { display: block; text-decoration: none; color: #333; font-size: 0.9rem; margin-bottom: 8px; }
+  .fcol h5 { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink); font-weight: 700; margin-bottom: 12px; }
+  .fcol a { display: block; text-decoration: none; color: #444; font-size: 0.9rem; margin-bottom: 8px; }
   .fcol a:hover { color: var(--accent); }
-  .fmeta { max-width: var(--wide); margin: 36px auto 0; padding: 0 24px; display: flex; justify-content: space-between; color: var(--muted); font-size: 0.8rem; flex-wrap: wrap; gap: 8px; }
-  .wordmark { border-top: 1px solid var(--line); margin-top: 24px; overflow: hidden; }
-  .wordmark div {
-    max-width: var(--wide); margin: 0 auto; padding: 22px 24px 10px;
-    font-weight: 800; letter-spacing: -0.04em; line-height: 0.9;
-    font-size: clamp(2.6rem, 11vw, 8rem); color: var(--ink); white-space: nowrap;
-  }
+  .fmeta { max-width: var(--wide); margin: 34px auto 0; padding: 0 24px 20px; display: flex; justify-content: space-between; color: var(--muted); font-size: 0.8rem; flex-wrap: wrap; gap: 8px; }
+  .wordmark { background: #0a0a0a; overflow: hidden; }
+  .wordmark div { max-width: var(--wide); margin: 0 auto; padding: 26px 24px 18px; font-weight: 800; letter-spacing: -0.045em; line-height: 0.9; font-size: clamp(2.4rem, 11vw, 8rem); color: #fff; white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -177,38 +144,23 @@
   <h1>Ghost Font Decoder</h1>
   <p class="lede">
     Ghost fonts are marketed as text that AI can't read — a message written in
-    motion, unreadable in any single frame. Type below, pause it, and watch it
-    vanish into noise. Then see how <b>this plugin breaks through it in a few
-    hundred lines of Python.</b>
+    motion, invisible in any single frame. Below is a live one. Press
+    <b>Decode</b> and watch this plugin pull the hidden message straight out
+    of the noise.
   </p>
 </section>
 
 <div class="demo">
   <div class="stage">
-    <canvas id="ghost" width="960" height="340" aria-label="Live ghost font demo"></canvas>
+    <canvas id="ghost" width="960" height="360" aria-label="Ghost font decode demo"></canvas>
+    <div class="readout" id="readout">Decoded: <b>HELLO HUMAN</b></div>
   </div>
-
-  <div class="field">
-    <label for="msg">Write your message</label>
-    <input type="text" id="msg" maxlength="14" value="HELLO HUMAN" autocomplete="off">
+  <div class="actions">
+    <button class="btn-primary" id="decodeBtn"><span class="dot"></span> Decode this video</button>
   </div>
-
-  <div class="controls">
-    <button class="ctl" id="toggle">Pause</button>
-    <button class="ctl" id="invert">Invert</button>
-    <button class="ctl" id="reveal">Decoder view</button>
-    <span class="speed">Speed <input type="range" id="speed" min="0.3" max="3" step="0.1" value="1.1"></span>
-    <button class="ctl" id="reset">Reset</button>
-  </div>
-
-  <div class="cta-row">
-    <a class="btn-primary" href="#install">Decode it — get the skill</a>
-  </div>
-
-  <p class="state">
-    State: <span id="stateLabel">playing</span>.
-    <b>Playing</b>, you read it. <b>Paused</b>, every frame is noise — that is all
-    a frame-by-frame AI ever sees. <b>Decoder view</b> shows what the skill recovers.
+  <p class="subnote">
+    Right now it's just moving dots — <b>pause any frame and it's pure noise</b>,
+    which is all a frame-by-frame AI ever sees. The decoder reads the motion instead.
   </p>
 </div>
 
@@ -219,8 +171,8 @@
       A ghost font writes a message using motion. The text is a field of random
       dots that drift in one direction, sitting inside a background of dots that
       drift in another. Human vision separates the two motions instantly, so the
-      message is legible while it plays. Pause it and the letters disappear —
-      no single frame holds any difference between text and background, so
+      message is legible while it plays. Pause it and the letters disappear — no
+      single frame holds any difference between text and background, so
       screenshots, frame extraction, and OCR all come back empty.
     </p>
     <p>
@@ -311,7 +263,7 @@ python decode.py examples/ghost-message.mp4</pre>
 <pre><span class="c"># paste prompts/decode-in-chat.md into</span>
 <span class="c"># Claude, ChatGPT, or Codex, then</span>
 <span class="c"># attach your ghost-font video.</span></pre>
-      <p>Runs the exact same optical-flow process in the chat and replies with the hidden text. <a href="https://github.com/haroontrailblazer/ghost-font-decoder/blob/main/prompts/decode-in-chat.md">Open the prompt</a>.</p>
+      <p>Runs the exact same optical-flow process in the chat. <a href="https://github.com/haroontrailblazer/ghost-font-decoder/blob/main/prompts/decode-in-chat.md">Open the prompt</a>.</p>
     </div>
   </div>
 </section>
@@ -344,7 +296,7 @@ python decode.py examples/ghost-message.mp4</pre>
     </div>
   </div>
   <div class="fmeta">
-    <span>© 2026 Haroon K M</span>
+    <span>© 2026 Haroon K M · MIT License</span>
     <span>No more ghosting.</span>
   </div>
   <div class="wordmark"><div>NO MORE GHOSTING</div></div>
@@ -354,85 +306,96 @@ python decode.py examples/ghost-message.mp4</pre>
 (function () {
   const canvas = document.getElementById('ghost');
   const ctx = canvas.getContext('2d');
-  const input = document.getElementById('msg');
-  const toggleBtn = document.getElementById('toggle');
-  const invertBtn = document.getElementById('invert');
-  const revealBtn = document.getElementById('reveal');
-  const resetBtn = document.getElementById('reset');
-  const speedEl = document.getElementById('speed');
-  const stateLabel = document.getElementById('stateLabel');
+  const btn = document.getElementById('decodeBtn');
+  const readout = document.getElementById('readout');
 
   const W = canvas.width, H = canvas.height;
-  const DOT = 2.3;
-  const N = Math.floor((W * H) / 46);
+  const DOT = 2.2;
+  const N = Math.floor((W * H) / 40);
+  const TEXT = 'HELLO HUMAN';
+  const BG = '#ececea', DOTCOL = '#2f2f2f', INKTEXT = '#0a0a0a';
 
-  let mask = null, dots = [], playing = true, reveal = false, invert = false;
-  let speed = parseFloat(speedEl.value);
-  let raf = null;
-
-  function buildMask(text) {
-    const m = document.createElement('canvas');
-    m.width = W; m.height = H;
-    const mc = m.getContext('2d');
-    mc.fillStyle = '#fff';
-    mc.textAlign = 'center'; mc.textBaseline = 'middle';
-    let size = 180;
-    do {
-      mc.font = '800 ' + size + 'px ' + getComputedStyle(document.body).fontFamily;
-      size -= 6;
-    } while (mc.measureText(text).width > W * 0.9 && size > 20);
-    mc.fillText(text, W / 2, H / 2);
-    mask = mc.getImageData(0, 0, W, H).data;
-  }
+  // offscreen text mask
+  const mc = document.createElement('canvas'); mc.width = W; mc.height = H;
+  const mx = mc.getContext('2d');
+  (function buildMask() {
+    mx.fillStyle = '#fff'; mx.textAlign = 'center'; mx.textBaseline = 'middle';
+    let size = 200;
+    do { mx.font = '800 ' + size + 'px ' + getComputedStyle(document.body).fontFamily; size -= 6; }
+    while (mx.measureText(TEXT).width > W * 0.86 && size > 20);
+    mx.fillText(TEXT, W / 2, H / 2);
+  })();
+  const maskData = mx.getImageData(0, 0, W, H).data;
   function inText(x, y) {
     const xi = x | 0, yi = y | 0;
     if (xi < 0 || yi < 0 || xi >= W || yi >= H) return false;
-    return mask[(yi * W + xi) * 4 + 3] > 128;
+    return maskData[(yi * W + xi) * 4 + 3] > 128;
   }
-  function seed() {
-    dots = [];
-    for (let i = 0; i < N; i++) dots.push({ x: Math.random() * W, y: Math.random() * H });
-  }
-  function frame() {
-    ctx.fillStyle = '#000';
-    ctx.fillRect(0, 0, W, H);
-    for (const d of dots) {
-      const t = inText(d.x, d.y);
-      if (playing) {
-        const dir = (t ? -1 : 1) * (invert ? -1 : 1);
-        d.x += dir * speed;
-        if (d.x < 0) d.x += W;
-        if (d.x >= W) d.x -= W;
-      }
-      ctx.fillStyle = (reveal && t) ? '#12a67a' : '#f2f2f2';
-      ctx.fillRect(d.x, d.y, DOT, DOT);
+
+  let dots = [];
+  function seed() { dots = []; for (let i = 0; i < N; i++) dots.push({ x: Math.random() * W, y: Math.random() * H }); }
+
+  let mode = 'playing';      // playing | scanning | revealed
+  let scanY = 0, raf = null;
+  const SPEED = 1.1, SCAN_STEP = H / 90;
+
+  function step() {
+    ctx.fillStyle = BG; ctx.fillRect(0, 0, W, H);
+
+    if (mode === 'revealed') {
+      // crisp solid text
+      ctx.save(); ctx.globalCompositeOperation = 'source-over';
+      ctx.drawImage(tintText(), 0, 0); ctx.restore();
+      raf = null; return;
     }
-    raf = playing ? requestAnimationFrame(frame) : null;
-  }
-  function setPlaying(p) {
-    playing = p;
-    toggleBtn.textContent = playing ? 'Pause' : 'Play';
-    stateLabel.textContent = playing ? 'playing' : 'paused';
-    stateLabel.classList.toggle('paused', !playing);
-    if (playing && raf === null) raf = requestAnimationFrame(frame);
-    if (!playing) frame();
+
+    // draw the still-noisy region (below the scan line while scanning)
+    for (const d of dots) {
+      if (mode === 'scanning' && d.y < scanY) continue;   // this band already decoded
+      const t = inText(d.x, d.y);
+      d.x += (t ? -SPEED : SPEED);
+      if (d.x < 0) d.x += W; if (d.x >= W) d.x -= W;
+      ctx.fillStyle = DOTCOL; ctx.fillRect(d.x, d.y, DOT, DOT);
+    }
+
+    if (mode === 'scanning') {
+      // revealed band on top: solid text clipped to y < scanY
+      ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, scanY); ctx.clip();
+      ctx.drawImage(tintText(), 0, 0); ctx.restore();
+      // scan line
+      ctx.fillStyle = 'rgba(18,166,122,0.9)'; ctx.fillRect(0, scanY - 1.5, W, 3);
+      scanY += SCAN_STEP;
+      if (scanY >= H) { mode = 'revealed'; readout.classList.add('show'); btn.disabled = false; btn.innerHTML = 'Decode again'; }
+    }
+    raf = requestAnimationFrame(step);
   }
 
-  input.addEventListener('input', () => {
-    const t = (input.value || 'HELLO HUMAN').toUpperCase();
-    buildMask(t || 'HELLO HUMAN');
-    if (!playing) frame();
+  // cache a dark-text render
+  let _tint = null;
+  function tintText() {
+    if (_tint) return _tint;
+    const c = document.createElement('canvas'); c.width = W; c.height = H;
+    const g = c.getContext('2d');
+    g.drawImage(mc, 0, 0);
+    g.globalCompositeOperation = 'source-in';
+    g.fillStyle = INKTEXT; g.fillRect(0, 0, W, H);
+    _tint = c; return c;
+  }
+
+  btn.addEventListener('click', () => {
+    if (mode === 'revealed') {           // reset
+      readout.classList.remove('show'); seed(); mode = 'playing';
+      btn.innerHTML = '<span class="dot"></span> Decode this video';
+      if (raf === null) raf = requestAnimationFrame(step);
+      return;
+    }
+    if (mode !== 'playing') return;
+    mode = 'scanning'; scanY = 0; btn.disabled = true; btn.textContent = 'Decoding…';
+    if (raf === null) raf = requestAnimationFrame(step);
   });
-  toggleBtn.addEventListener('click', () => setPlaying(!playing));
-  canvas.addEventListener('click', () => setPlaying(!playing));
-  invertBtn.addEventListener('click', () => { invert = !invert; invertBtn.classList.toggle('on', invert); });
-  revealBtn.addEventListener('click', () => { reveal = !reveal; revealBtn.classList.toggle('on', reveal); if (!playing) frame(); });
-  resetBtn.addEventListener('click', () => { seed(); if (!playing) frame(); });
-  speedEl.addEventListener('input', () => { speed = parseFloat(speedEl.value); });
 
-  buildMask('HELLO HUMAN'); seed();
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) setPlaying(false);
-  else raf = requestAnimationFrame(frame);
+  seed();
+  raf = requestAnimationFrame(step);
 })();
 </script>
 
