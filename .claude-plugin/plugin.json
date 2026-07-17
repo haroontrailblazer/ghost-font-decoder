@@ -7,6 +7,8 @@
     "name": "baskaran",
     "email": "baskaran@closefuture.io"
   },
+  "homepage": "https://github.com/haroontrailblazer/ghost-font-decoder",
+  "repository": "https://github.com/haroontrailblazer/ghost-font-decoder",
   "license": "MIT",
   "keywords": ["ghost-font", "hidden-text", "optical-flow", "video", "ocr", "kinematogram", "steganography"]
 }

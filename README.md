@@ -14,7 +14,7 @@ and tells you what the video says.
 ## Install (Claude Code)
 
 ```
-/plugin marketplace add USER/ghost-font-decoder
+/plugin marketplace add haroontrailblazer/ghost-font-decoder
 /plugin install ghost-font-decoder@ghost-font-tools
 ```
 
