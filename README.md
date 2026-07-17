@@ -8,15 +8,20 @@ This repository packages a `ghost-decode` skill for Codex and Claude Code. Its
 Python decoder reads the motion with dense optical flow, compensates for glyph
 drift, produces a clean reveal, and optionally runs OCR.
 
+Each tool gets a skill written for its own conventions: Claude Code loads
+`claude-skills/ghost-decode/`, Codex loads `codex-skills/ghost-decode/`.
+Neither tool sees the other's skill.
+
 ![Revealed message](examples/revealed.png)
 
 ## Use with Codex
 
 The repository is a Codex plugin root:
 
-- `.codex-plugin/plugin.json` contains the Codex plugin manifest and UI metadata.
-- `skills/ghost-decode/SKILL.md` contains the skill workflow.
-- `skills/ghost-decode/agents/openai.yaml` contains the skill's Codex UI metadata.
+- `.codex-plugin/plugin.json` contains the Codex plugin manifest and UI metadata,
+  pointing at `codex-skills/`.
+- `codex-skills/ghost-decode/SKILL.md` contains the skill workflow.
+- `codex-skills/ghost-decode/agents/openai.yaml` contains the skill's Codex UI metadata.
 
 Add this repository as a local plugin source in a Codex marketplace, install
 `ghost-font-decoder`, and start a new task so Codex loads the skill. Then ask:
@@ -28,7 +33,7 @@ text.
 
 ## Use with Claude Code
 
-Claude Code compatibility is retained through `.claude-plugin`:
+Claude Code loads its own skill from `claude-skills/` via `.claude-plugin`:
 
 ```text
 /plugin marketplace add haroontrailblazer/ghost-font-decoder

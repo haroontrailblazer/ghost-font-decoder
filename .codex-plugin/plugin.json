@@ -1,6 +1,6 @@
 {
   "name": "ghost-font-decoder",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Reveal text hidden in ghost-font videos and motion-defined random-dot clips using optical flow and OCR.",
   "author": {
     "name": "baskaran",
@@ -19,7 +19,7 @@
     "kinematogram",
     "steganography"
   ],
-  "skills": "./skills/",
+  "skills": "./codex-skills/",
   "interface": {
     "displayName": "Ghost Font Decoder",
     "shortDescription": "Reveal motion-hidden text in noisy videos",
