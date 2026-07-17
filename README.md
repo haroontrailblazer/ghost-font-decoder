@@ -131,6 +131,14 @@ python decode.py VIDEO -o OUT_DIR --method farneback --stride 2 --max-frames 200
 
 The included example (`examples/ghost-message.mp4`) decodes to `HELLO HUMAN`.
 
+## A note on the hype
+
+Ghost fonts are often described as text AI cannot read. This is a simple
+problem: the message is encoded in motion, and motion is exactly what dense
+optical flow measures — a technique older than modern AI. This decoder is a
+few hundred lines of Python and read its first ghost-font video on the first
+run. With this skill installed, your agent reads the hype too.
+
 ## Star history
 
 [![Star History Chart](https://api.star-history.com/svg?repos=haroontrailblazer/ghost-font-decoder&type=Date)](https://star-history.com/#haroontrailblazer/ghost-font-decoder&Date)

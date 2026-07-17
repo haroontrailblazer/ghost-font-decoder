@@ -147,6 +147,7 @@
   <div class="brand">Ghost Font <span>Decoder</span></div>
   <nav class="top">
     <a href="#how">How it works</a>
+    <a href="#reality">The hype</a>
     <a href="#install">Install</a>
     <a href="https://github.com/haroontrailblazer/ghost-font-decoder">GitHub</a>
   </nav>
@@ -234,6 +235,39 @@
         <img src="assets/revealed.png" alt="Decoder output: the words HELLO HUMAN in white on black">
         <figcaption><b>Output:</b> the decoder's revealed mask. OCR reads HELLO HUMAN.</figcaption>
       </figure>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="reality">
+  <div class="wrap">
+    <h2>The hype vs. the reality</h2>
+    <p>
+      Ghost fonts are being sold as "the text AI cannot read." Let's be honest:
+      <b>this is a simple problem, and it never deserved the hype.</b> Hiding a
+      message in motion is a textbook computer-vision exercise, and the tools
+      that break it — dense optical flow and phase correlation — are decades
+      old, older than modern AI itself. This entire decoder is a few hundred
+      lines of Python. It read its first ghost-font video on the first run.
+      <b>And now your agent reads the hype too</b> — install the skill and the
+      "unreadable" text is just text.
+    </p>
+    <div class="cards">
+      <div class="card">
+        <div class="step">THE CLAIM</div>
+        <h3>"AI can't read this"</h3>
+        <p>Because agents read video frame by frame, and every frame is noise.</p>
+      </div>
+      <div class="card">
+        <div class="step">THE REALITY</div>
+        <h3>AI reads motion too</h3>
+        <p>The message is encoded in motion — so the decoder reads the motion. Nothing about it is hidden from a system that looks properly.</p>
+      </div>
+      <div class="card">
+        <div class="step">THE VERDICT</div>
+        <h3>A novelty, not a defense</h3>
+        <p>A protection that collapses to a small script is a visual effect, not a security boundary. AI is far past this.</p>
+      </div>
     </div>
   </div>
 </section>
