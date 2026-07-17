@@ -28,6 +28,16 @@ Recover motion-defined text with the decoder bundled at the plugin root.
 6. If the command prints `Hidden message:`, visually verify the OCR result against the revealed image. If OCR is unavailable or disagrees with the image, read the image directly.
 7. Report the recovered text and the absolute paths of both output images. State uncertainty when any character is ambiguous.
 
+## No-install / chat fallback
+
+If the bundled `decode.py` is not present — for example these steps are being
+run in a chat without the plugin installed — reproduce the decoder yourself:
+write the Python program from `prompts/decode-in-chat.md` (at the plugin root)
+to a temporary file and run it on the video with the same steps. The algorithm
+is identical: dense optical flow, median background subtraction,
+phase-correlation drift registration, accumulation, Otsu threshold, then OCR.
+Never OCR a raw frame — every frame is noise.
+
 ## Troubleshooting
 
 - Retry a weak or empty mask with `--method farneback`.

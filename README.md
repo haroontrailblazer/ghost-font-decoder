@@ -42,6 +42,10 @@ pip install -r requirements.txt
 python decode.py examples/ghost-message.mp4     # prints: HELLO HUMAN
 ```
 
+**Any chat — no install:** paste [`prompts/decode-in-chat.md`](prompts/decode-in-chat.md)
+into Claude, ChatGPT, or Codex, attach your video, and it runs the exact same
+optical-flow process and replies with the hidden text.
+
 ## One repo, two plugins
 
 Each tool gets a skill written for its own conventions — neither sees the other's:

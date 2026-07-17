@@ -23,6 +23,16 @@ Ghost-font videos hide a message as a random-dot field: every frame is uniform n
 5. If OCR was skipped (no Tesseract engine) or disagrees with the image, report what you see in `revealed.png`. The heatmap `revealed_heatmap.png` preserves faint letter detail the cleaned mask may lose.
 6. Tell the user the hidden message and the absolute paths of both output images; note any characters you are unsure about.
 
+## No-install / chat fallback
+
+If `${CLAUDE_PLUGIN_ROOT}/decode.py` is not present — for example this skill's
+steps are being run in a chat without the plugin installed — reproduce the
+decoder yourself: write the Python program from `prompts/decode-in-chat.md`
+(bundled at the plugin root) to a temporary file and run it on the video with
+the same steps. The algorithm is identical: dense optical flow, median
+background subtraction, phase-correlation drift registration, accumulation,
+Otsu threshold, then OCR. Never OCR a raw frame — every frame is noise.
+
 ## Troubleshooting
 
 - Weak or empty mask: retry with `--method farneback`; for high-fps clips also try `--stride 2`.
