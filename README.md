@@ -1,4 +1,4 @@
-# 👻 Ghost Font Decoder
+# Ghost Font Decoder
 
 **No more ghosting.** Reveal the text hidden inside "ghost font" videos — with Codex, Claude Code, or plain Python.
 
@@ -20,7 +20,7 @@ the motion directly with dense optical flow and tells you what the video says.
 | :---: | :---: |
 | ![A paused frame: pure noise](examples/paused-frame.png) | ![The revealed hidden message](examples/revealed.png) |
 
-## ⚡ Quick start
+## Quick start
 
 **Claude Code** — two commands, then just ask:
 
@@ -42,7 +42,7 @@ pip install -r requirements.txt
 python decode.py examples/ghost-message.mp4     # prints: HELLO HUMAN
 ```
 
-## 🧩 One repo, two plugins
+## One repo, two plugins
 
 Each tool gets a skill written for its own conventions — neither sees the other's:
 
@@ -121,7 +121,7 @@ Useful options:
 python decode.py VIDEO -o OUT_DIR --method farneback --stride 2 --max-frames 200 --no-ocr
 ```
 
-## 🔬 How it works
+## How it works
 
 1. Compute dense optical flow between consecutive frames.
 2. Subtract median background flow and score counter-moving pixels.
@@ -131,11 +131,11 @@ python decode.py VIDEO -o OUT_DIR --method farneback --stride 2 --max-frames 200
 
 The included example (`examples/ghost-message.mp4`) decodes to `HELLO HUMAN`.
 
-## ⭐ Star history
+## Star history
 
 [![Star History Chart](https://api.star-history.com/svg?repos=haroontrailblazer/ghost-font-decoder&type=Date)](https://star-history.com/#haroontrailblazer/ghost-font-decoder&Date)
 
-If this saved you from a ghost, a ⭐ helps others find it.
+If you find this project useful, consider starring the repository to help others discover it.
 
 ## Author
 
