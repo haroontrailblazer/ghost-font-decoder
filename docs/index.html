@@ -12,7 +12,7 @@
     --ink: #0a0a0a;
     --muted: #6f6f6f;
     --line: #e7e7e4;
-    --accent: #12a67a;
+    --accent: #0a0a0a;
     --max: 760px;
     --wide: 1120px;
     --sans: "Helvetica Neue", Helvetica, Arial, "Segoe UI", Roboto, sans-serif;
@@ -52,25 +52,17 @@
   .hero .lede b { color: var(--ink); font-weight: 600; }
 
   /* creative decode headline (no video, no tool) */
-  .decoder { max-width: 880px; margin: 40px auto 0; padding: 0 24px; text-align: center; }
-  .kicker {
-    display: inline-flex; align-items: center; gap: 8px;
-    font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted);
-  }
-  .pulse { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); animation: pulse 1.5s ease-in-out infinite; }
-  @keyframes pulse { 0%,100% { opacity: 0.25; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.15); } }
+  .decoder { max-width: 880px; margin: 44px auto 0; padding: 0 24px; text-align: center; }
   .scramble-line {
-    margin: 20px auto 0; min-height: 2.6em; display: flex; align-items: center; justify-content: center;
+    margin: 0 auto; min-height: 2.6em; display: flex; align-items: center; justify-content: center;
   }
   #scramble {
     font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace;
     font-size: clamp(1.5rem, 4.6vw, 2.7rem); font-weight: 600; letter-spacing: 0.01em;
     line-height: 1.15; color: var(--ink);
   }
-  #scramble .g { color: #c7c7c3; }      /* unresolved glyph */
-  #scramble .r { color: var(--accent); }  /* just-resolved glyph */
-  .caret { display: inline-block; width: 0.55ch; background: var(--accent); margin-left: 2px; animation: blink 1s steps(1) infinite; }
-  @keyframes blink { 50% { opacity: 0; } }
+  #scramble .g { color: #bdbdbd; }   /* unresolved glyph (light gray) */
+  #scramble .r { color: var(--ink); }  /* just-resolved glyph */
   .subnote { color: var(--muted); font-size: 0.95rem; margin: 24px auto 0; max-width: 560px; text-align: center; }
   .subnote b { color: var(--ink); }
   .hero-cta { margin-top: 26px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
@@ -81,7 +73,6 @@
     font-size: 0.95rem; font-weight: 500; font-family: var(--sans);
   }
   .btn-primary:hover { background: #000; }
-  .btn-primary .dot { width: 8px; height: 8px; border-radius: 50%; background: #4fe3b4; }
   .btn-ghost {
     display: inline-flex; align-items: center; text-decoration: none;
     border: 1px solid var(--line); border-radius: 8px; padding: 12px 22px;
@@ -103,7 +94,7 @@
 
   .steps { max-width: 880px; margin: 28px auto 0; padding: 0 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
   .steps .cell { background: #fff; padding: 18px; }
-  .steps .cell .n { font-size: 0.72rem; letter-spacing: 0.1em; color: var(--accent); font-weight: 700; }
+  .steps .cell .n { font-size: 0.72rem; letter-spacing: 0.1em; color: var(--muted); font-weight: 700; }
   .steps .cell h4 { font-size: 0.98rem; font-weight: 600; margin: 6px 0 5px; }
   .steps .cell p { font-size: 0.88rem; color: var(--muted); margin: 0; }
 
@@ -130,7 +121,7 @@
   .fcols { max-width: var(--wide); margin: 0 auto; padding: 0 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 28px; }
   .fcol h5 { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: #9a9a9a; font-weight: 600; margin-bottom: 12px; }
   .fcol a { display: block; text-decoration: none; color: #d0d0d0; font-size: 0.9rem; margin-bottom: 8px; }
-  .fcol a:hover { color: #fff; }
+  .fcol a:hover { color: #fff; text-decoration: underline; }
   .fmeta { max-width: var(--wide); margin: 40px auto 0; padding: 0 24px; display: flex; justify-content: space-between; color: #7a7a7a; font-size: 0.8rem; flex-wrap: wrap; gap: 8px; border-top: 1px solid #1e1e1e; padding-top: 22px; }
   .wordmark { overflow: hidden; }
   .wordmark div { max-width: var(--wide); margin: 0 auto; padding: 20px 24px 22px; font-weight: 800; letter-spacing: -0.045em; line-height: 0.9; font-size: clamp(2.4rem, 11vw, 8rem); color: #fff; white-space: nowrap; }
@@ -164,14 +155,13 @@
 </section>
 
 <div class="decoder">
-  <div class="kicker"><span class="pulse"></span> Decoding</div>
   <div class="scramble-line"><span id="scramble" aria-live="polite">HELLO HUMAN</span></div>
   <p class="subnote">
     A ghost font scrambles its message into motion so no AI can read a frame of it.
     <b>This plugin unscrambles it — give your agent the skill and the hidden text is just text.</b>
   </p>
   <div class="hero-cta">
-    <a class="btn-primary" href="#install"><span class="dot"></span> Get the skill</a>
+    <a class="btn-primary" href="#install">Get the skill</a>
     <a class="btn-ghost" href="https://github.com/haroontrailblazer/ghost-font-decoder">View on GitHub</a>
   </div>
 </div>
