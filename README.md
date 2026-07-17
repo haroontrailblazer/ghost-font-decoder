@@ -1,18 +1,55 @@
-# Ghost Font Decoder — Codex and Claude Code plugin
+# 👻 Ghost Font Decoder
+
+**No more ghosting.** Reveal the text hidden inside "ghost font" videos — with Codex, Claude Code, or plain Python.
+
+[![GitHub Repo stars](https://img.shields.io/github/stars/haroontrailblazer/ghost-font-decoder?style=social)](https://github.com/haroontrailblazer/ghost-font-decoder/stargazers)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.8%2B-3776AB?logo=python&logoColor=white)](requirements.txt)
+[![Claude Code plugin](https://img.shields.io/badge/Claude_Code-plugin-d97757)](#use-with-claude-code)
+[![Codex plugin](https://img.shields.io/badge/Codex-plugin-171717)](#use-with-codex)
 
 "Ghost font" videos hide text in a random-dot field. A paused frame looks like
 uniform noise, but dots inside the letter shapes move against the background,
-making the message visible only during playback.
+making the message visible only during playback — invisible to anything that
+reads video frame by frame.
 
-This repository packages a `ghost-decode` skill for Codex and Claude Code. Its
-Python decoder reads the motion with dense optical flow, compensates for glyph
-drift, produces a clean reveal, and optionally runs OCR.
+The trick has one weakness: **the message *is* the motion.** This decoder reads
+the motion directly with dense optical flow and tells you what the video says.
 
-Each tool gets a skill written for its own conventions: Claude Code loads
-`claude-skills/ghost-decode/`, Codex loads `codex-skills/ghost-decode/`.
-Neither tool sees the other's skill.
+| Paused frame — what a frame-by-frame reader sees | Decoded with optical flow |
+| :---: | :---: |
+| ![A paused frame: pure noise](examples/paused-frame.png) | ![The revealed hidden message](examples/revealed.png) |
 
-![Revealed message](examples/revealed.png)
+## ⚡ Quick start
+
+**Claude Code** — two commands, then just ask:
+
+```text
+/plugin marketplace add haroontrailblazer/ghost-font-decoder
+/plugin install ghost-font-decoder@ghost-font-tools
+```
+
+> what does ghost-video.mp4 say?
+
+**Codex** — add this repo as a plugin source, install `ghost-font-decoder`, then:
+
+> Use $ghost-decode to tell me what ghost-video.mp4 says.
+
+**Plain Python** — no AI required:
+
+```text
+pip install -r requirements.txt
+python decode.py examples/ghost-message.mp4     # prints: HELLO HUMAN
+```
+
+## 🧩 One repo, two plugins
+
+Each tool gets a skill written for its own conventions — neither sees the other's:
+
+| Tool | Manifest | Skill |
+| --- | --- | --- |
+| Claude Code | `.claude-plugin/plugin.json` + `marketplace.json` | `claude-skills/ghost-decode/SKILL.md` |
+| Codex | `.codex-plugin/plugin.json` | `codex-skills/ghost-decode/SKILL.md` + `agents/openai.yaml` |
 
 ## Use with Codex
 
@@ -84,7 +121,7 @@ Useful options:
 python decode.py VIDEO -o OUT_DIR --method farneback --stride 2 --max-frames 200 --no-ocr
 ```
 
-## How it works
+## 🔬 How it works
 
 1. Compute dense optical flow between consecutive frames.
 2. Subtract median background flow and score counter-moving pixels.
@@ -92,4 +129,14 @@ python decode.py VIDEO -o OUT_DIR --method farneback --stride 2 --max-frames 200
 4. Accumulate scores, threshold them, and clean the mask.
 5. Run optional Tesseract OCR and verify the result against the reveal.
 
-The included example decodes to `HELLO HUMAN`.
+The included example (`examples/ghost-message.mp4`) decodes to `HELLO HUMAN`.
+
+## ⭐ Star history
+
+[![Star History Chart](https://api.star-history.com/svg?repos=haroontrailblazer/ghost-font-decoder&type=Date)](https://star-history.com/#haroontrailblazer/ghost-font-decoder&Date)
+
+If this saved you from a ghost, a ⭐ helps others find it.
+
+## Author
+
+Made by **Haroon K M** ([@haroontrailblazer](https://github.com/haroontrailblazer)) — MIT licensed.
