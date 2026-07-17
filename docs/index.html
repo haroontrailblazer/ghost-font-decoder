@@ -16,6 +16,7 @@
     --max: 760px;
     --wide: 1120px;
     --sans: "Helvetica Neue", Helvetica, Arial, "Segoe UI", Roboto, sans-serif;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
@@ -33,51 +34,63 @@
     background: rgba(255,255,255,0.92); backdrop-filter: saturate(180%) blur(8px);
   }
   .nav-inner { max-width: var(--wide); margin: 0 auto; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
-  .logo { font-weight: 800; letter-spacing: -0.03em; font-size: 1.05rem; text-decoration: none; }
-  .logo b { color: var(--accent); }
-  .nav-links { display: flex; gap: 26px; align-items: center; }
+  .logo { font-weight: 800; letter-spacing: -0.02em; font-size: 1.02rem; text-decoration: none; color: var(--ink); }
+  .logo b { font-weight: 800; }
+  .nav-links { display: flex; gap: 28px; align-items: center; }
   .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.9rem; }
   .nav-links a:hover { color: var(--ink); }
-  .nav-cta { border: 1px solid var(--ink); border-radius: 6px; padding: 7px 14px; color: var(--ink) !important; font-size: 0.85rem; }
-  .nav-cta:hover { background: var(--ink); color: #fff !important; }
+  .nav-cta { color: var(--ink) !important; font-weight: 500; }
   @media (max-width: 640px) { .nav-links a.hideable { display: none; } }
 
   .crumb { color: var(--muted); font-size: 0.82rem; padding: 30px 0 0; text-align: center; }
   .crumb a { text-decoration: none; }
   .crumb a:hover { text-decoration: underline; }
 
-  .hero { text-align: center; padding: 16px 0 6px; }
-  .hero h1 { font-size: clamp(2.6rem, 6.5vw, 3.7rem); font-weight: 700; letter-spacing: -0.035em; line-height: 1.02; }
-  .hero .lede { color: var(--muted); max-width: 560px; margin: 20px auto 0; font-size: 1.03rem; }
+  .hero { text-align: center; padding: 22px 0 6px; }
+  .hero h1 { font-family: var(--serif); font-size: clamp(2.5rem, 6vw, 3.6rem); font-weight: 400; letter-spacing: -0.01em; line-height: 1.05; }
+  .hero .lede { color: var(--muted); max-width: 540px; margin: 22px auto 0; font-size: 1.0rem; }
   .hero .lede b { color: var(--ink); font-weight: 600; }
 
-  /* decode showcase */
-  .demo { max-width: 880px; margin: 36px auto 0; padding: 0 24px; }
-  .stage { position: relative; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: #ececea; }
-  #ghost { display: block; width: 100%; height: auto; }
-  .readout {
-    position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%);
-    background: rgba(10,10,10,0.86); color: #fff; font-size: 0.82rem;
-    padding: 7px 14px; border-radius: 999px; letter-spacing: 0.02em;
-    opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap;
+  /* creative decode headline (no video, no tool) */
+  .decoder { max-width: 880px; margin: 40px auto 0; padding: 0 24px; text-align: center; }
+  .kicker {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted);
   }
-  .readout.show { opacity: 1; }
-  .readout b { color: #4fe3b4; font-weight: 600; }
-  .actions { text-align: center; margin-top: 20px; }
+  .pulse { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); animation: pulse 1.5s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity: 0.25; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.15); } }
+  .scramble-line {
+    margin: 20px auto 0; min-height: 2.6em; display: flex; align-items: center; justify-content: center;
+  }
+  #scramble {
+    font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+    font-size: clamp(1.5rem, 4.6vw, 2.7rem); font-weight: 600; letter-spacing: 0.01em;
+    line-height: 1.15; color: var(--ink);
+  }
+  #scramble .g { color: #c7c7c3; }      /* unresolved glyph */
+  #scramble .r { color: var(--accent); }  /* just-resolved glyph */
+  .caret { display: inline-block; width: 0.55ch; background: var(--accent); margin-left: 2px; animation: blink 1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .subnote { color: var(--muted); font-size: 0.95rem; margin: 24px auto 0; max-width: 560px; text-align: center; }
+  .subnote b { color: var(--ink); }
+  .hero-cta { margin-top: 26px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
   .btn-primary {
     display: inline-flex; align-items: center; gap: 9px;
     background: var(--ink); color: #fff; text-decoration: none; cursor: pointer;
-    border: 1px solid var(--ink); border-radius: 8px; padding: 13px 26px;
-    font-size: 0.98rem; font-weight: 500; font-family: var(--sans);
+    border: 1px solid var(--ink); border-radius: 8px; padding: 12px 24px;
+    font-size: 0.95rem; font-weight: 500; font-family: var(--sans);
   }
   .btn-primary:hover { background: #000; }
-  .btn-primary[disabled] { opacity: 0.55; cursor: default; }
   .btn-primary .dot { width: 8px; height: 8px; border-radius: 50%; background: #4fe3b4; }
-  .subnote { color: var(--muted); font-size: 0.86rem; margin-top: 14px; text-align: center; }
-  .subnote b { color: var(--ink); }
+  .btn-ghost {
+    display: inline-flex; align-items: center; text-decoration: none;
+    border: 1px solid var(--line); border-radius: 8px; padding: 12px 22px;
+    font-size: 0.95rem; color: var(--ink); font-weight: 500;
+  }
+  .btn-ghost:hover { border-color: var(--ink); }
 
-  section.doc { padding: 62px 0 0; }
-  section.doc h2 { text-align: center; font-weight: 700; font-size: 1.7rem; letter-spacing: -0.02em; margin-bottom: 22px; }
+  section.doc { padding: 66px 0 0; }
+  section.doc h2 { font-family: var(--serif); text-align: center; font-weight: 400; font-size: 1.9rem; letter-spacing: -0.01em; margin-bottom: 24px; }
   section.doc p { color: #2a2a2a; margin: 0 auto 18px; max-width: 640px; }
   section.doc p b { color: var(--ink); }
 
@@ -96,7 +109,7 @@
 
   .callout { background: var(--bg-soft); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin-top: 64px; padding: 58px 0; }
   .callout .tag { text-align: center; font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
-  .callout h2 { text-align: center; font-weight: 700; font-size: clamp(1.6rem, 4vw, 2.3rem); letter-spacing: -0.02em; margin: 10px auto 20px; max-width: 720px; }
+  .callout h2 { font-family: var(--serif); text-align: center; font-weight: 400; font-size: clamp(1.7rem, 4vw, 2.4rem); letter-spacing: -0.01em; margin: 12px auto 22px; max-width: 720px; }
   .callout h2 em { font-style: normal; color: var(--accent); }
   .callout p { color: #2a2a2a; max-width: 620px; margin: 0 auto 16px; }
   .callout p b { color: var(--ink); }
@@ -113,14 +126,14 @@
   pre .c { color: #7d8590; }
   .inst p { font-size: 0.86rem; color: var(--muted); margin-top: 10px; }
 
-  footer.site { border-top: 1px solid var(--line); margin-top: 72px; padding: 48px 0 0; }
+  footer.site { background: #0a0a0a; margin-top: 76px; padding: 56px 0 0; }
   .fcols { max-width: var(--wide); margin: 0 auto; padding: 0 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 28px; }
-  .fcol h5 { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink); font-weight: 700; margin-bottom: 12px; }
-  .fcol a { display: block; text-decoration: none; color: #444; font-size: 0.9rem; margin-bottom: 8px; }
-  .fcol a:hover { color: var(--accent); }
-  .fmeta { max-width: var(--wide); margin: 34px auto 0; padding: 0 24px 20px; display: flex; justify-content: space-between; color: var(--muted); font-size: 0.8rem; flex-wrap: wrap; gap: 8px; }
-  .wordmark { background: #0a0a0a; overflow: hidden; }
-  .wordmark div { max-width: var(--wide); margin: 0 auto; padding: 26px 24px 18px; font-weight: 800; letter-spacing: -0.045em; line-height: 0.9; font-size: clamp(2.4rem, 11vw, 8rem); color: #fff; white-space: nowrap; }
+  .fcol h5 { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: #9a9a9a; font-weight: 600; margin-bottom: 12px; }
+  .fcol a { display: block; text-decoration: none; color: #d0d0d0; font-size: 0.9rem; margin-bottom: 8px; }
+  .fcol a:hover { color: #fff; }
+  .fmeta { max-width: var(--wide); margin: 40px auto 0; padding: 0 24px; display: flex; justify-content: space-between; color: #7a7a7a; font-size: 0.8rem; flex-wrap: wrap; gap: 8px; border-top: 1px solid #1e1e1e; padding-top: 22px; }
+  .wordmark { overflow: hidden; }
+  .wordmark div { max-width: var(--wide); margin: 0 auto; padding: 20px 24px 22px; font-weight: 800; letter-spacing: -0.045em; line-height: 0.9; font-size: clamp(2.4rem, 11vw, 8rem); color: #fff; white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -144,24 +157,23 @@
   <h1>Ghost Font Decoder</h1>
   <p class="lede">
     Ghost fonts are marketed as text that AI can't read — a message written in
-    motion, invisible in any single frame. Below is a live one. Press
-    <b>Decode</b> and watch this plugin pull the hidden message straight out
-    of the noise.
+    motion, invisible in any single frame. It's a simple problem, and
+    <b>this plugin pulls the hidden message straight back out</b> in a few
+    hundred lines of Python.
   </p>
 </section>
 
-<div class="demo">
-  <div class="stage">
-    <canvas id="ghost" width="960" height="360" aria-label="Ghost font decode demo"></canvas>
-    <div class="readout" id="readout">Decoded: <b>HELLO HUMAN</b></div>
-  </div>
-  <div class="actions">
-    <button class="btn-primary" id="decodeBtn"><span class="dot"></span> Decode this video</button>
-  </div>
+<div class="decoder">
+  <div class="kicker"><span class="pulse"></span> Decoding</div>
+  <div class="scramble-line"><span id="scramble" aria-live="polite">HELLO HUMAN</span></div>
   <p class="subnote">
-    Right now it's just moving dots — <b>pause any frame and it's pure noise</b>,
-    which is all a frame-by-frame AI ever sees. The decoder reads the motion instead.
+    A ghost font scrambles its message into motion so no AI can read a frame of it.
+    <b>This plugin unscrambles it — give your agent the skill and the hidden text is just text.</b>
   </p>
+  <div class="hero-cta">
+    <a class="btn-primary" href="#install"><span class="dot"></span> Get the skill</a>
+    <a class="btn-ghost" href="https://github.com/haroontrailblazer/ghost-font-decoder">View on GitHub</a>
+  </div>
 </div>
 
 <section class="doc" id="what">
@@ -304,98 +316,68 @@ python decode.py examples/ghost-message.mp4</pre>
 
 <script>
 (function () {
-  const canvas = document.getElementById('ghost');
-  const ctx = canvas.getContext('2d');
-  const btn = document.getElementById('decodeBtn');
-  const readout = document.getElementById('readout');
+  const el = document.getElementById('scramble');
+  if (!el) return;
+  const PHRASES = [
+    "HELLO HUMAN",
+    "THE TEXT THEY SAID AI CAN'T READ",
+    "YOUR AGENT READS IT ANYWAY",
+    "NO MORE GHOSTING",
+  ];
+  const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&*/<>{}=+";
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  const W = canvas.width, H = canvas.height;
-  const DOT = 2.2;
-  const N = Math.floor((W * H) / 40);
-  const TEXT = 'HELLO HUMAN';
-  const BG = '#ececea', DOTCOL = '#2f2f2f', INKTEXT = '#0a0a0a';
+  function rnd(n) { return Math.floor(Math.random() * n); }
 
-  // offscreen text mask
-  const mc = document.createElement('canvas'); mc.width = W; mc.height = H;
-  const mx = mc.getContext('2d');
-  (function buildMask() {
-    mx.fillStyle = '#fff'; mx.textAlign = 'center'; mx.textBaseline = 'middle';
-    let size = 200;
-    do { mx.font = '800 ' + size + 'px ' + getComputedStyle(document.body).fontFamily; size -= 6; }
-    while (mx.measureText(TEXT).width > W * 0.86 && size > 20);
-    mx.fillText(TEXT, W / 2, H / 2);
-  })();
-  const maskData = mx.getImageData(0, 0, W, H).data;
-  function inText(x, y) {
-    const xi = x | 0, yi = y | 0;
-    if (xi < 0 || yi < 0 || xi >= W || yi >= H) return false;
-    return maskData[(yi * W + xi) * 4 + 3] > 128;
+  // Resolve `text` from scrambled glyphs. Each character locks in at a random
+  // step; until then it flickers through random glyphs. Returns a promise.
+  function scrambleTo(text) {
+    return new Promise((resolve) => {
+      const from = el.textContent;
+      const len = Math.max(from.length, text.length);
+      const queue = [];
+      for (let i = 0; i < len; i++) {
+        const to = text[i] || '';
+        const start = rnd(28);
+        const end = start + 14 + rnd(28);
+        queue.push({ to, start, end, char: '' });
+      }
+      let frame = 0;
+      (function tick() {
+        let out = '', done = 0;
+        for (const q of queue) {
+          if (frame >= q.end) { done++; out += q.to; }
+          else if (frame >= q.start) {
+            if (!q.char || Math.random() < 0.28) q.char = GLYPHS[rnd(GLYPHS.length)];
+            out += '<span class="' + (frame > q.end - 6 ? 'r' : 'g') + '">' + q.char + '</span>';
+          } else {
+            out += q.to === ' ' ? ' ' : '<span class="g">' + GLYPHS[rnd(GLYPHS.length)] + '</span>';
+          }
+        }
+        el.innerHTML = out;
+        if (done === queue.length) { resolve(); return; }
+        frame++;
+        requestAnimationFrame(tick);
+      })();
+    });
   }
 
-  let dots = [];
-  function seed() { dots = []; for (let i = 0; i < N; i++) dots.push({ x: Math.random() * W, y: Math.random() * H }); }
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
-  let mode = 'playing';      // playing | scanning | revealed
-  let scanY = 0, raf = null;
-  const SPEED = 1.1, SCAN_STEP = H / 90;
-
-  function step() {
-    ctx.fillStyle = BG; ctx.fillRect(0, 0, W, H);
-
-    if (mode === 'revealed') {
-      // crisp solid text
-      ctx.save(); ctx.globalCompositeOperation = 'source-over';
-      ctx.drawImage(tintText(), 0, 0); ctx.restore();
-      raf = null; return;
+  async function run() {
+    let i = 0;
+    // hold the first phrase briefly so it's readable before the loop
+    el.textContent = PHRASES[0];
+    await wait(900);
+    while (true) {
+      i = (i + 1) % PHRASES.length;
+      await scrambleTo(PHRASES[i]);
+      await wait(1700);
     }
-
-    // draw the still-noisy region (below the scan line while scanning)
-    for (const d of dots) {
-      if (mode === 'scanning' && d.y < scanY) continue;   // this band already decoded
-      const t = inText(d.x, d.y);
-      d.x += (t ? -SPEED : SPEED);
-      if (d.x < 0) d.x += W; if (d.x >= W) d.x -= W;
-      ctx.fillStyle = DOTCOL; ctx.fillRect(d.x, d.y, DOT, DOT);
-    }
-
-    if (mode === 'scanning') {
-      // revealed band on top: solid text clipped to y < scanY
-      ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, scanY); ctx.clip();
-      ctx.drawImage(tintText(), 0, 0); ctx.restore();
-      // scan line
-      ctx.fillStyle = 'rgba(18,166,122,0.9)'; ctx.fillRect(0, scanY - 1.5, W, 3);
-      scanY += SCAN_STEP;
-      if (scanY >= H) { mode = 'revealed'; readout.classList.add('show'); btn.disabled = false; btn.innerHTML = 'Decode again'; }
-    }
-    raf = requestAnimationFrame(step);
   }
 
-  // cache a dark-text render
-  let _tint = null;
-  function tintText() {
-    if (_tint) return _tint;
-    const c = document.createElement('canvas'); c.width = W; c.height = H;
-    const g = c.getContext('2d');
-    g.drawImage(mc, 0, 0);
-    g.globalCompositeOperation = 'source-in';
-    g.fillStyle = INKTEXT; g.fillRect(0, 0, W, H);
-    _tint = c; return c;
-  }
-
-  btn.addEventListener('click', () => {
-    if (mode === 'revealed') {           // reset
-      readout.classList.remove('show'); seed(); mode = 'playing';
-      btn.innerHTML = '<span class="dot"></span> Decode this video';
-      if (raf === null) raf = requestAnimationFrame(step);
-      return;
-    }
-    if (mode !== 'playing') return;
-    mode = 'scanning'; scanY = 0; btn.disabled = true; btn.textContent = 'Decoding…';
-    if (raf === null) raf = requestAnimationFrame(step);
-  });
-
-  seed();
-  raf = requestAnimationFrame(step);
+  if (reduce) { el.textContent = PHRASES[0]; return; }
+  run();
 })();
 </script>
 
