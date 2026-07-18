@@ -350,7 +350,7 @@
     max-width: 100%;
     color: var(--signal);
     font-family: var(--mono);
-    font-size: clamp(1.85rem, 3.15vw, 3.35rem);
+    font-size: 2.15rem;
     font-weight: 700;
     line-height: 1.08;
     letter-spacing: 0.055em;
@@ -359,9 +359,6 @@
     text-transform: uppercase;
   }
   #scramble .ghost { color: #5f6856; }
-  #scramble.is-long {
-    font-size: clamp(1.75rem, 1.95vw, 2.15rem);
-  }
 
   .section {
     padding-block: var(--section);
@@ -858,7 +855,6 @@
     .button { min-height: 50px; }
     .decoder-window { height: 490px; }
     .decoded-message { padding-block: 20px; }
-    #scramble { font-size: clamp(1.85rem, 3vw, 3rem); }
   }
 
   @media (max-height: 720px) and (min-width: 1101px) {
@@ -877,7 +873,6 @@
     .decoder-bar,
     .decoder-output-label { min-height: 42px; }
     .decoded-message { padding-block: 10px; }
-    #scramble { font-size: clamp(1.75rem, 2.7vw, 2.5rem); }
 
     #what > .intro-grid,
     .process,
@@ -1437,7 +1432,6 @@ Paste it into Claude, ChatGPT, or Codex.</pre>
   });
 
   async function scrambleTo(text) {
-    scramble.classList.toggle("is-long", text.length > 28);
     const length = Math.max(scramble.textContent.length, text.length);
     const queue = Array.from({ length }, (_, index) => ({
       target: text[index] || "",
