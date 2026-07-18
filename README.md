@@ -283,8 +283,7 @@ evidence, and answer with the recovered message.
  </picture>
 </a>
 
-If this project helped you decode the invisible, consider
-[starring the repository](https://github.com/haroontrailblazer/ghost-font-decoder).
+
 
 ## License
 
