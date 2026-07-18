@@ -779,11 +779,12 @@
     .doc-hero {
       padding-block: clamp(30px, 5svh, 64px);
     }
-  }
-
-  @media (max-height: 850px) and (min-width: 1101px) {
     .doc-hero h1 {
       font-size: clamp(4rem, min(6.4vw, 12svh), 6.3rem);
+    }
+    .doc-hero h1 .hero-line {
+      display: block;
+      white-space: nowrap;
     }
     .hero-rule {
       margin: 24px 0 18px;
@@ -919,7 +920,10 @@
   <section class="doc-hero" id="top">
     <div class="shell doc-hero-grid">
       <div class="doc-hero-copy reveal">
-        <h1>The message is the motion.</h1>
+        <h1>
+          <span class="hero-line">The message</span>
+          <span class="hero-line">is the motion.</span>
+        </h1>
         <div class="hero-rule" aria-hidden="true"></div>
         <p class="doc-hero-lede">
           Ghost fonts hide glyphs in the relationship between video frames.
