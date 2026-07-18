@@ -107,40 +107,62 @@ The screenshots below document the same hidden message—**I LOVE YOU**—being
 recovered in Claude Code, Claude.ai, and Codex. They show the agent invocation,
 the reported text, and the generated visual evidence.
 
+<p align="center"><sub>Click or tap any screenshot to view it at full resolution.</sub></p>
+
 ### 1. Claude Code — successful decode
 
 Claude Code ran the decoder across 185 frame pairs, compensated for drift, and
 identified the full three-line message.
 
-<img src="docs/assets/proof/claude-code-decoded.png" alt="Claude Code successfully decoding the hidden text I LOVE YOU" width="100%">
+<p align="center">
+  <a href="docs/assets/proof/claude-code-decoded.png">
+    <img src="docs/assets/proof/claude-code-decoded.png" alt="Claude Code successfully decoding the hidden text I LOVE YOU" width="720">
+  </a>
+</p>
 
 ### 2. Claude.ai — skill invoked from chat
 
 The uploaded `ghost-decode` skill accepted the video and returned the hidden
 message directly in the conversation.
 
-<img src="docs/assets/proof/claude-ai-decoded.png" alt="Claude.ai ghost font skill reporting I LOVE YOU" width="100%">
+<p align="center">
+  <a href="docs/assets/proof/claude-ai-decoded.png">
+    <img src="docs/assets/proof/claude-ai-decoded.png" alt="Claude.ai ghost font skill reporting I LOVE YOU" width="720">
+  </a>
+</p>
 
 ### 3. Claude.ai — generated evidence files
 
 Claude.ai returned both outputs used to verify the answer: the cleaned reveal
 and the raw motion heatmap.
 
-<img src="docs/assets/proof/claude-ai-outputs.png" alt="Claude.ai providing the revealed image and heatmap files" width="100%">
+<p align="center">
+  <a href="docs/assets/proof/claude-ai-outputs.png">
+    <img src="docs/assets/proof/claude-ai-outputs.png" alt="Claude.ai providing the revealed image and heatmap files" width="720">
+  </a>
+</p>
 
 ### 4. Claude.ai — recovered mask preview
 
 Opening the generated reveal makes the hidden **I LOVE YOU** message directly
 visible.
 
-<img src="docs/assets/proof/claude-ai-reveal.png" alt="Clean mask revealing the words I LOVE YOU in Claude.ai" width="100%">
+<p align="center">
+  <a href="docs/assets/proof/claude-ai-reveal.png">
+    <img src="docs/assets/proof/claude-ai-reveal.png" alt="Clean mask revealing the words I LOVE YOU in Claude.ai" width="720">
+  </a>
+</p>
 
 ### 5. Codex — plugin result rendered in the task
 
 Codex invoked the installed skill, reported the decoded text, rendered the
 reveal, and linked both generated outputs.
 
-<img src="docs/assets/proof/codex-decoded.png" alt="Codex successfully decoding and displaying the hidden text I LOVE YOU" width="100%">
+<p align="center">
+  <a href="docs/assets/proof/codex-decoded.png">
+    <img src="docs/assets/proof/codex-decoded.png" alt="Codex successfully decoding and displaying the hidden text I LOVE YOU" width="720">
+  </a>
+</p>
 
 > The screenshots are execution evidence, not mockups. The decoded masks are
 > generated from motion in the supplied video.
