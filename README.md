@@ -275,7 +275,9 @@ evidence, and answer with the recovered message.
 
 ## Star history
 
-[![Star History Chart](https://api.star-history.com/svg?repos=haroontrailblazer/ghost-font-decoder&type=Date)](https://star-history.com/#haroontrailblazer/ghost-font-decoder&Date)
+## Star History
+
+[![Star History Chart](https://api.star-history.com/chart?repos=haroontrailblazer/ghost-font-decoder&type=date&legend=top-left&sealed_token=vwxhhE2zezvsD4ucXF6OeY877lxdK7sMT42EghOdA0ytQAsax_9y6rMO4rA3KoEu3pq8XyLB_BkrhR4hUxkAMAKVdmx5nU491RhAFRxg9aeo9JOGObdndVhvGDYMDa0HtG7-fcCGeG9_b2f9LRtbw1IMC-YPSmNuPdlCjEsi0Q58h3f5I6TImyqTEl1I)](https://www.star-history.com/?type=date&repos=haroontrailblazer%2Fghost-font-decoder)
 
 If this project helped you decode the invisible, consider
 [starring the repository](https://github.com/haroontrailblazer/ghost-font-decoder).
