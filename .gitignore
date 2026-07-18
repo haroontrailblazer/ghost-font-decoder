@@ -4,3 +4,7 @@ __pycache__/
 /revealed_heatmap.png
 
 www.mixfont.com_ghost-font.png
+
+# Built skill archive — never commit. A zip inside the repo is a nested zip
+# inside the plugin package (source "./"), which claude.ai rejects on install.
+claude-ai-skill/*.zip

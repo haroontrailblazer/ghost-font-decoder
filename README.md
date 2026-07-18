@@ -41,8 +41,9 @@ Same skill name — `ghost-decode` — across all three tools.
 
 > what does ghost-video.mp4 say?
 
-**claude.ai** — download [`claude-ai-skill/ghost-decode.zip`](claude-ai-skill/ghost-decode.zip)
-and upload it in **Settings → Capabilities → Skills**, then attach a video and ask:
+**claude.ai** — build the skill zip with `python claude-ai-skill/build-zip.py`,
+upload the resulting `ghost-decode.zip` in **Settings → Capabilities → Skills**
+(see [`claude-ai-skill/README.md`](claude-ai-skill/README.md)), then attach a video and ask:
 
 > What does this video say?
 

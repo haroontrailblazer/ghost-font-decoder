@@ -5,14 +5,27 @@ for **claude.ai** (the web/desktop app). It decodes ghost-font videos — text
 hidden in moving dots that is invisible in any paused frame — by running a small
 optical-flow program in claude.ai's code sandbox.
 
-## Download & install (2 minutes)
+## Build the upload archive
 
-1. Download **[`ghost-decode.zip`](ghost-decode.zip)** from this folder
-   (on GitHub: open the file and click **Download raw**).
-2. In claude.ai, open **Settings → Capabilities → Skills** (Pro/Team/Enterprise;
+The zip is **not** committed to the repo on purpose — a zip inside the repo is a
+nested zip inside the plugin package, and claude.ai rejects that on install
+(`Nested zip files are not allowed`). Build it locally in one step:
+
+```bash
+python claude-ai-skill/build-zip.py
+```
+
+This writes `claude-ai-skill/ghost-decode.zip` containing only
+`ghost-decode/SKILL.md` and `ghost-decode/decode.py`.
+
+## Install in claude.ai (2 minutes)
+
+1. In claude.ai, open **Settings → Capabilities → Skills** (Pro/Team/Enterprise;
    code execution must be enabled).
-3. Click **Upload skill** and choose `ghost-decode.zip`.
-4. Start a new chat, attach a ghost-font video, and ask:
+2. Click **Upload skill** and choose the single **`ghost-decode.zip`** you built.
+   Upload only that file — do **not** upload a zip of the whole repo or of the
+   `claude-ai-skill/` folder, or you'll hit the nested-zip error.
+3. Start a new chat, attach a ghost-font video, and ask:
 
    > What does this video say?
 
