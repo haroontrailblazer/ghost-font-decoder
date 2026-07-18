@@ -1,171 +1,268 @@
+<div align="center">
+
 # Ghost Font Decoder
 
-**No more ghosting.** Reveal the text hidden inside "ghost font" videos — with Codex, Claude Code, or plain Python.
+### Give AI agents motion vision.
 
-[![GitHub Repo stars](https://img.shields.io/github/stars/haroontrailblazer/ghost-font-decoder?style=social)](https://github.com/haroontrailblazer/ghost-font-decoder/stargazers)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Python](https://img.shields.io/badge/python-3.8%2B-3776AB?logo=python&logoColor=white)](requirements.txt)
-[![Claude Code plugin](https://img.shields.io/badge/Claude_Code-plugin-d97757)](#use-with-claude-code)
-[![Codex plugin](https://img.shields.io/badge/Codex-plugin-171717)](#use-with-codex)
+Decode text hidden inside random-dot “ghost font” videos with **Codex**,
+**Claude Code**, **Claude.ai**, or **plain Python**.
 
-"Ghost font" videos hide text in a random-dot field. A paused frame looks like
-uniform noise, but dots inside the letter shapes move against the background,
-making the message visible only during playback — invisible to anything that
-reads video frame by frame.
+[![GitHub stars](https://img.shields.io/github/stars/haroontrailblazer/ghost-font-decoder?style=for-the-badge&logo=github&label=Stars)](https://github.com/haroontrailblazer/ghost-font-decoder/stargazers)
+[![MIT License](https://img.shields.io/badge/License-MIT-22c55e?style=for-the-badge)](LICENSE)
+[![Python 3.8+](https://img.shields.io/badge/Python-3.8%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](requirements.txt)
+[![Claude Code](https://img.shields.io/badge/Claude_Code-Plugin-D97757?style=for-the-badge)](#claude-code)
+[![Codex](https://img.shields.io/badge/Codex-Plugin-111111?style=for-the-badge&logo=openai)](#codex)
 
-The trick has one weakness: **the message *is* the motion.** This decoder reads
-the motion directly with dense optical flow and tells you what the video says.
+**No more ghosting. The message is the motion—and this decoder reads it.**
 
-| Paused frame — what a frame-by-frame reader sees | Decoded with optical flow |
+</div>
+
+---
+
+## The problem
+
+Ghost-font videos conceal text inside a moving random-dot field. Pause the
+video and every frame appears to be uniform noise. The letters emerge only
+when their dots move differently from the background, so image-only readers
+miss the message entirely.
+
+Ghost Font Decoder analyzes that motion with dense optical flow, reconstructs
+the hidden glyphs, and gives the agent both a clean reveal and a heatmap it can
+verify.
+
+| Paused frame — looks like noise | Recovered motion mask |
 | :---: | :---: |
+| <img src="examples/paused-frame.png" alt="A paused ghost-font video frame that appears as random noise" width="100%"> | <img src="examples/revealed.png" alt="Decoded hidden text recovered from motion" width="100%"> |
 
-https://github.com/user-attachments/assets/b04e8d6e-5fe3-4e4e-89ae-7201fdb96c06
+## Why it stands out
 
-<img width="1917" height="1023" alt="Screenshot 2026-07-18 085832" src="https://github.com/user-attachments/assets/d2b5eb58-a51c-4474-990d-51489f6c4409" />
-|
+- **Agent-native** — one `ghost-decode` skill across Codex, Claude Code, and Claude.ai.
+- **Actually motion-aware** — analyzes movement across frame pairs instead of guessing from a still image.
+- **Verifiable output** — produces both a cleaned binary mask and the raw motion heatmap.
+- **Works without an agent** — the same decoder runs directly from Python.
+- **OCR is optional** — visual recovery still works when Tesseract is unavailable.
+- **Local by design** — decoding runs on the machine executing the skill.
 
 ## Quick start
 
-Same skill name — `ghost-decode` — across all three tools.
+### Claude Code
 
-**Claude Code** — two commands, then run the slash command (or just ask):
+Install the plugin, then pass it a video:
 
 ```text
 /plugin marketplace add haroontrailblazer/ghost-font-decoder
 /plugin install ghost-font-decoder@ghost-font-tools
-```
-
-```text
 /ghost-decode path/to/ghost-video.mp4
 ```
 
-> what does ghost-video.mp4 say?
+You can also ask naturally:
 
-**claude.ai** — build the skill zip with `python claude-ai-skill/build-zip.py`,
-upload the resulting `ghost-decode.zip` in **Settings → Capabilities → Skills**
-(see [`claude-ai-skill/README.md`](claude-ai-skill/README.md)), then attach a video and ask:
+> What does `ghost-video.mp4` say?
 
-> What does this video say?
+### Codex
 
-**Codex** — add this repo as a plugin source, install `ghost-font-decoder`, then:
+Add this repository as a plugin source, install **Ghost Font Decoder**, start a
+new task, and ask:
 
-> Use $ghost-decode to tell me what ghost-video.mp4 says.
+> Use `$ghost-decode` to tell me what `ghost-video.mp4` says.
 
-**Plain Python** — no AI required:
+Codex runs the bundled decoder, inspects the generated mask, displays the
+result in the task, and reports the recovered text.
+
+### Claude.ai
+
+Build the uploadable skill package:
 
 ```text
+python claude-ai-skill/build-zip.py
+```
+
+Upload `ghost-decode.zip` under **Settings → Capabilities → Skills**, attach a
+video, and ask what it says. See the
+[Claude.ai installation guide](claude-ai-skill/README.md) for the complete
+setup.
+
+### Plain Python
+
+```bash
 pip install -r requirements.txt
-python decode.py examples/ghost-message.mp4     # prints: Text in the video: HELLO HUMAN
-```
-
-**Any chat — no install:** paste [`prompts/decode-in-chat.md`](prompts/decode-in-chat.md)
-into Claude, ChatGPT, or Codex, attach your video, and it runs the exact same
-optical-flow process and replies with the hidden text.
-
-## One repo, two plugins
-
-Each tool gets a skill written for its own conventions — neither sees the other's:
-
-| Tool | Manifest | Skill |
-| --- | --- | --- |
-| Claude Code | `.claude-plugin/plugin.json` + `marketplace.json` | `claude-skills/ghost-decode/SKILL.md` |
-| Codex | `.codex-plugin/plugin.json` | `codex-skills/ghost-decode/SKILL.md` + `agents/openai.yaml` |
-
-## Use with Codex
-
-The repository is a Codex plugin root:
-
-- `.codex-plugin/plugin.json` contains the Codex plugin manifest and UI metadata,
-  pointing at `codex-skills/`.
-- `codex-skills/ghost-decode/SKILL.md` contains the skill workflow.
-- `codex-skills/ghost-decode/agents/openai.yaml` contains the skill's Codex UI metadata.
-
-Add this repository as a local plugin source in a Codex marketplace, install
-`ghost-font-decoder`, and start a new task so Codex loads the skill. Then ask:
-
-> Use $ghost-decode to tell me what ghost-video.mp4 says.
-
-Codex runs the bundled decoder, checks the revealed mask, renders
-`revealed.png` directly in chat, and responds with
-`Text in the video: <recovered text>`.
-
-## Use with Claude Code
-
-Claude Code loads its own skill from `claude-skills/` via `.claude-plugin`:
-
-```text
-/plugin marketplace add haroontrailblazer/ghost-font-decoder
-/plugin install ghost-font-decoder@ghost-font-tools
-```
-
-Then ask:
-
-> What does ghost-video.mp4 say?
-
-or invoke the skill directly:
-
-```text
-/ghost-decode path/to/video.mp4
-```
-
-## Requirements
-
-Install Python 3 dependencies with:
-
-```text
-pip install -r requirements.txt
-```
-
-Tesseract is optional. On Windows it can be installed with:
-
-```text
-winget install UB-Mannheim.TesseractOCR
-```
-
-Without Tesseract, the plugin still produces images that Codex or Claude can
-inspect visually.
-
-## Standalone use
-
-```text
 python decode.py examples/ghost-message.mp4
 ```
 
-The command writes:
-
-- `revealed_heatmap.png` — raw opposition score
-- `revealed.png` — cleaned binary mask
-
-Useful options:
+The included example decodes to:
 
 ```text
-python decode.py VIDEO -o OUT_DIR --method farneback --stride 2 --max-frames 200 --no-ocr
+Text in the video: HELLO HUMAN
 ```
+
+No plugin installation is required. You can also paste
+[`prompts/decode-in-chat.md`](prompts/decode-in-chat.md) into a supported chat,
+attach the video, and run the same optical-flow workflow.
+
+---
+
+## Proof: decoded by real agents
+
+The screenshots below document the same hidden message—**I LOVE YOU**—being
+recovered in Claude Code, Claude.ai, and Codex. They show the agent invocation,
+the reported text, and the generated visual evidence.
+
+### 1. Claude Code — successful decode
+
+Claude Code ran the decoder across 185 frame pairs, compensated for drift, and
+identified the full three-line message.
+
+<img src="docs/assets/proof/claude-code-decoded.png" alt="Claude Code successfully decoding the hidden text I LOVE YOU" width="100%">
+
+### 2. Claude.ai — skill invoked from chat
+
+The uploaded `ghost-decode` skill accepted the video and returned the hidden
+message directly in the conversation.
+
+<img src="docs/assets/proof/claude-ai-decoded.png" alt="Claude.ai ghost font skill reporting I LOVE YOU" width="100%">
+
+### 3. Claude.ai — generated evidence files
+
+Claude.ai returned both outputs used to verify the answer: the cleaned reveal
+and the raw motion heatmap.
+
+<img src="docs/assets/proof/claude-ai-outputs.png" alt="Claude.ai providing the revealed image and heatmap files" width="100%">
+
+### 4. Claude.ai — recovered mask preview
+
+Opening the generated reveal makes the hidden **I LOVE YOU** message directly
+visible.
+
+<img src="docs/assets/proof/claude-ai-reveal.png" alt="Clean mask revealing the words I LOVE YOU in Claude.ai" width="100%">
+
+### 5. Codex — plugin result rendered in the task
+
+Codex invoked the installed skill, reported the decoded text, rendered the
+reveal, and linked both generated outputs.
+
+<img src="docs/assets/proof/codex-decoded.png" alt="Codex successfully decoding and displaying the hidden text I LOVE YOU" width="100%">
+
+> The screenshots are execution evidence, not mockups. The decoded masks are
+> generated from motion in the supplied video.
+
+---
 
 ## How it works
 
-1. Compute dense optical flow between consecutive frames.
-2. Subtract median background flow and score counter-moving pixels.
-3. Register the drifting glyph region with phase correlation.
-4. Accumulate scores, threshold them, and clean the mask.
-5. Run optional Tesseract OCR and verify the result against the reveal.
+```text
+Video
+  ↓
+Dense optical flow between consecutive frames
+  ↓
+Median background-motion subtraction
+  ↓
+Counter-motion scoring and drift registration
+  ↓
+Temporal score accumulation
+  ↓
+Thresholding and mask cleanup
+  ↓
+Revealed image + heatmap + optional OCR
+```
 
-The included example (`examples/ghost-message.mp4`) decodes to `HELLO HUMAN`.
+Under the hood, the decoder:
 
-## A note on the hype
+1. Computes dense optical flow between consecutive frames.
+2. Estimates and subtracts the dominant background movement.
+3. Scores pixels moving against that background.
+4. Registers the drifting glyph region with phase correlation.
+5. Accumulates evidence across time, thresholds it, and cleans the mask.
+6. Runs optional Tesseract OCR and lets the agent verify the visual result.
 
-Ghost fonts are often described as text AI cannot read. This is a simple
-problem: the message is encoded in motion, and motion is exactly what dense
-optical flow measures — a technique older than modern AI. This decoder is a
-few hundred lines of Python and read its first ghost-font video on the first
-run. With this skill installed, your agent reads the hype too.
+## Output
+
+Each run writes:
+
+| File | Purpose |
+| --- | --- |
+| `revealed.png` | Clean binary mask for direct visual inspection and OCR |
+| `revealed_heatmap.png` | Raw opposition score for faint or partially recovered glyphs |
+
+Useful command-line options:
+
+```bash
+python decode.py VIDEO \
+  -o OUT_DIR \
+  --method farneback \
+  --stride 2 \
+  --max-frames 200 \
+  --no-ocr
+```
+
+## Plugin structure
+
+This repository ships native skill packaging for each supported agent:
+
+| Surface | Integration |
+| --- | --- |
+| Claude Code | `.claude-plugin/plugin.json`, marketplace metadata, and `claude-skills/ghost-decode/SKILL.md` |
+| Claude.ai | Uploadable skill built from `claude-ai-skill/ghost-decode/SKILL.md` |
+| Codex | `.codex-plugin/plugin.json`, `codex-skills/ghost-decode/SKILL.md`, and `agents/openai.yaml` |
+| Any supported chat | Portable workflow in `prompts/decode-in-chat.md` |
+| Standalone | `decode.py` and `requirements.txt` |
+
+## Requirements
+
+- Python 3.8 or newer
+- OpenCV
+- NumPy
+- `pytesseract` for optional OCR
+
+Install Python dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+On Windows, Tesseract can be installed with:
+
+```powershell
+winget install UB-Mannheim.TesseractOCR
+```
+
+The reveal and heatmap are still generated when Tesseract is not installed.
+
+## Repository map
+
+```text
+ghost-font-decoder/
+├── decode.py                     # Optical-flow decoder
+├── examples/                     # Reproducible sample video and outputs
+├── claude-skills/                # Claude Code skill
+├── claude-ai-skill/              # Claude.ai uploadable skill source
+├── codex-skills/                 # Codex skill and UI metadata
+├── commands/                     # Claude Code slash command
+├── prompts/                      # Portable in-chat workflow
+└── docs/                         # Project page and proof assets
+```
+
+## The core insight
+
+Ghost fonts are often presented as text that AI cannot read. The harder truth
+is simply that the information is encoded in **motion**, not in any single
+frame. Dense optical flow is designed to measure exactly that signal.
+
+This project packages a proven computer-vision technique as an agent skill, so
+the same assistant that receives the video can run the analysis, inspect the
+evidence, and answer with the recovered message.
 
 ## Star history
 
 [![Star History Chart](https://api.star-history.com/svg?repos=haroontrailblazer/ghost-font-decoder&type=Date)](https://star-history.com/#haroontrailblazer/ghost-font-decoder&Date)
 
-If you find this project useful, consider starring the repository to help others discover it.
+If this project helped you decode the invisible, consider
+[starring the repository](https://github.com/haroontrailblazer/ghost-font-decoder).
+
+## License
+
+Released under the [MIT License](LICENSE).
 
 ## Author
 
-Made by **Haroon K M** ([@haroontrailblazer](https://github.com/haroontrailblazer)) — MIT licensed.
+Built by **Haroon K M**
+([@haroontrailblazer](https://github.com/haroontrailblazer)).
