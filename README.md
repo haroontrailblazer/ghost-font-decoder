@@ -18,7 +18,11 @@ the motion directly with dense optical flow and tells you what the video says.
 
 | Paused frame — what a frame-by-frame reader sees | Decoded with optical flow |
 | :---: | :---: |
-| ![A paused frame: pure noise](examples/paused-frame.png) | ![The revealed hidden message](examples/revealed.png) |
+
+https://github.com/user-attachments/assets/b04e8d6e-5fe3-4e4e-89ae-7201fdb96c06
+
+<img width="1917" height="1023" alt="Screenshot 2026-07-18 085832" src="https://github.com/user-attachments/assets/d2b5eb58-a51c-4474-990d-51489f6c4409" />
+|
 
 ## Quick start
 
