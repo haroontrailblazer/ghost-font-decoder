@@ -1,0 +1,1637 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: https://ogp.me/ns#">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#ffffff">
+<meta name="color-scheme" content="light dark">
+<title>Technical Documentation — Ghost Font Decoder</title>
+<meta name="description" content="Technical documentation for Ghost Font Decoder: dense optical flow, background-motion subtraction, drift registration, temporal accumulation, mask recovery, OCR, CLI usage, and verified agent outputs.">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://fontdecoder.vercel.app/documentation.html">
+<link rel="icon" href="assets/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="assets/brand-icon.png">
+<meta property="og:title" content="Ghost Font Decoder — Technical Documentation">
+<meta property="og:description" content="How motion-hidden text is reconstructed with classic computer vision.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://fontdecoder.vercel.app/documentation.html">
+<meta property="og:image" content="https://fontdecoder.vercel.app/assets/og-image-v4.jpg">
+<style>
+  :root {
+    --paper: #ffffff;
+    --ink: #090a09;
+    --ink-soft: #171917;
+    --muted: #626660;
+    --line: #d9dcd6;
+    --line-dark: #343732;
+    --signal: #9cff00;
+    --signal-deep: #61a900;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+    --sans: "Helvetica Neue", Helvetica, Arial, "Segoe UI", Roboto, sans-serif;
+    --mono: "SFMono-Regular", "Cascadia Code", "Roboto Mono", Consolas, "Liberation Mono", monospace;
+    --wide: 1440px;
+    --gutter: clamp(20px, 4.5vw, 72px);
+    --section: clamp(88px, 10vw, 144px);
+  }
+
+  * { box-sizing: border-box; }
+  html {
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    background: var(--paper);
+  }
+  html::-webkit-scrollbar { display: none; }
+  body {
+    margin: 0;
+    overflow-x: hidden;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection { background: var(--signal); color: var(--ink); }
+  img { max-width: 100%; }
+  a { color: inherit; }
+  button, a { -webkit-tap-highlight-color: transparent; }
+  button { font: inherit; }
+  [id] { scroll-margin-top: 104px; }
+
+  .skip-link {
+    position: fixed;
+    left: 16px;
+    top: 12px;
+    z-index: 100;
+    padding: 10px 14px;
+    background: var(--signal);
+    color: var(--ink);
+    font-weight: 700;
+    text-decoration: none;
+    transform: translateY(-160%);
+    transition: transform 160ms ease;
+  }
+  .skip-link:focus { transform: translateY(0); }
+
+  .shell {
+    width: min(100%, var(--wide));
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+
+  .site-nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    border-bottom: 1px solid rgba(9, 10, 9, 0.18);
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(14px);
+  }
+  .nav-inner {
+    min-height: 82px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+  }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--serif);
+    font-size: clamp(1.28rem, 2vw, 1.72rem);
+    line-height: 1;
+    letter-spacing: -0.035em;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .brand-mark {
+    width: 40px;
+    height: 40px;
+    flex: 0 0 auto;
+    display: block;
+    border-radius: 10px;
+    object-fit: cover;
+  }
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: clamp(20px, 3vw, 44px);
+  }
+  .nav-links a {
+    position: relative;
+    color: var(--ink);
+    font-size: 0.92rem;
+    text-decoration: none;
+  }
+  .nav-links a:not(.nav-github)::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 100%;
+    bottom: -7px;
+    height: 2px;
+    background: var(--signal-deep);
+    transition: right 180ms ease;
+  }
+  .nav-links a:hover::after,
+  .nav-links a:focus-visible::after { right: 0; }
+  .nav-github {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-weight: 600;
+  }
+  .nav-github svg { width: 16px; height: 16px; }
+
+  .doc-hero {
+    min-height: calc(100svh - 82px);
+    display: grid;
+    align-items: center;
+    padding-block: clamp(56px, 7vw, 104px);
+    border-bottom: 1px solid var(--ink);
+  }
+  .doc-hero-grid {
+    display: grid;
+    grid-template-columns: minmax(360px, 0.8fr) minmax(560px, 1.2fr);
+    align-items: center;
+    gap: clamp(56px, 7vw, 112px);
+  }
+  .doc-hero h1 {
+    max-width: 640px;
+    margin: 0;
+    font-family: var(--serif);
+    font-size: clamp(4.5rem, 7.3vw, 7.4rem);
+    font-weight: 400;
+    letter-spacing: -0.065em;
+    line-height: 0.84;
+  }
+  .hero-rule {
+    width: 88px;
+    height: 7px;
+    margin: 36px 0 26px;
+    background: var(--signal);
+  }
+  .doc-hero-lede {
+    max-width: 560px;
+    margin: 0;
+    font-size: clamp(1.08rem, 1.45vw, 1.32rem);
+    line-height: 1.55;
+    letter-spacing: -0.016em;
+  }
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 32px;
+  }
+  .button {
+    min-height: 54px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: 0 22px;
+    border: 1px solid var(--ink);
+    color: var(--ink);
+    font-size: 0.94rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: transform 180ms ease, background 180ms ease, color 180ms ease;
+  }
+  .button-primary { border-color: var(--signal); background: var(--signal); }
+  .button-secondary { background: var(--paper); }
+  .button:hover { transform: translateY(-2px); }
+  .button-secondary:hover { background: var(--ink); color: var(--paper); }
+  .button svg { width: 18px; height: 18px; }
+
+  .signal-proof {
+    margin: 0;
+    border: 1px solid var(--ink);
+    background: var(--ink);
+    box-shadow: 0 24px 70px rgba(7, 10, 6, 0.18);
+  }
+  .signal-proof-head {
+    min-height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 0 16px;
+    color: var(--paper);
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.055em;
+    text-transform: uppercase;
+  }
+  .signal-proof-head span:last-child { color: var(--signal); }
+  .signal-proof-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-top: 1px solid #454844;
+  }
+  .signal-proof-panel { min-width: 0; background: #080908; }
+  .signal-proof-panel + .signal-proof-panel { border-left: 1px solid #454844; }
+  .signal-proof-media {
+    position: relative;
+    height: clamp(250px, 27vw, 390px);
+    overflow: hidden;
+  }
+  .signal-proof-media img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    filter: grayscale(1) contrast(1.12);
+  }
+  .signal-proof-panel:last-child .signal-proof-media img {
+    object-fit: contain;
+    object-position: center;
+  }
+  .signal-proof-caption {
+    min-height: 54px;
+    display: flex;
+    align-items: center;
+    padding: 10px 14px;
+    border-top: 1px solid #454844;
+    color: #d4d8d1;
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    line-height: 1.45;
+  }
+
+  .doc-layout {
+    display: grid;
+    grid-template-columns: 245px minmax(0, 1fr);
+    gap: clamp(56px, 8vw, 124px);
+    align-items: start;
+    padding-block: var(--section);
+  }
+  .toc {
+    position: sticky;
+    top: 114px;
+    border-top: 2px solid var(--ink);
+  }
+  .toc-title {
+    margin: 0;
+    padding: 18px 0 14px;
+    border-bottom: 1px solid var(--ink);
+    color: var(--signal-deep);
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+  }
+  .toc a {
+    display: grid;
+    grid-template-columns: 30px 1fr;
+    gap: 8px;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 0.86rem;
+    line-height: 1.35;
+    text-decoration: none;
+    transition: color 160ms ease, padding-left 160ms ease;
+  }
+  .toc a span {
+    color: var(--signal-deep);
+    font-family: var(--mono);
+    font-size: 0.7rem;
+  }
+  .toc a:hover,
+  .toc a:focus-visible,
+  .toc a.is-active {
+    padding-left: 8px;
+    color: var(--ink);
+  }
+
+  .doc-content { min-width: 0; }
+  .doc-section {
+    padding-bottom: clamp(90px, 10vw, 142px);
+  }
+  .doc-section + .doc-section {
+    padding-top: clamp(90px, 10vw, 142px);
+    border-top: 1px solid var(--ink);
+  }
+  .section-label {
+    margin: 0 0 20px;
+    color: var(--signal-deep);
+    font-family: var(--mono);
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+  }
+  .section-title {
+    max-width: 930px;
+    margin: 0;
+    font-family: var(--serif);
+    font-size: clamp(3.2rem, 5.5vw, 5.6rem);
+    font-weight: 400;
+    letter-spacing: -0.052em;
+    line-height: 0.94;
+  }
+  .section-intro {
+    max-width: 790px;
+    margin: 34px 0 0;
+    color: #282b27;
+    font-size: clamp(1.05rem, 1.35vw, 1.2rem);
+    line-height: 1.72;
+  }
+  .section-intro strong { color: var(--ink); }
+
+  .concept-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(38px, 6vw, 82px);
+    margin-top: 58px;
+  }
+  .concept-block {
+    border-top: 2px solid var(--ink);
+    padding-top: 24px;
+  }
+  .concept-number {
+    color: var(--signal-deep);
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    font-weight: 700;
+  }
+  .concept-block h3 {
+    margin: 22px 0 14px;
+    font-family: var(--serif);
+    font-size: clamp(1.85rem, 3vw, 2.7rem);
+    font-weight: 400;
+    letter-spacing: -0.035em;
+    line-height: 1;
+  }
+  .concept-block p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.96rem;
+    line-height: 1.7;
+  }
+
+  .equation {
+    margin-top: 54px;
+    overflow-x: auto;
+    padding: 30px 34px;
+    border: 1px solid var(--ink);
+    background: #0d0f0d;
+    color: #e8ebe5;
+    font-family: var(--mono);
+  }
+  .equation-label {
+    display: block;
+    margin-bottom: 18px;
+    color: var(--signal);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .equation code {
+    font-size: clamp(0.88rem, 1.35vw, 1.08rem);
+    line-height: 1.8;
+    white-space: pre;
+  }
+  .equation-note {
+    margin: 20px 0 0;
+    color: #aeb3aa;
+    font-size: 0.84rem;
+    line-height: 1.6;
+  }
+
+  .pipeline {
+    margin-top: 62px;
+    border-top: 2px solid var(--ink);
+  }
+  .pipeline-step {
+    display: grid;
+    grid-template-columns: 90px minmax(220px, 0.42fr) minmax(0, 1fr);
+    gap: clamp(22px, 4vw, 56px);
+    padding: 34px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .pipeline-number {
+    color: var(--signal-deep);
+    font-family: var(--mono);
+    font-size: clamp(2rem, 3.2vw, 3.2rem);
+    line-height: 1;
+  }
+  .pipeline-step h3 {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: clamp(1.55rem, 2.4vw, 2.2rem);
+    font-weight: 400;
+    letter-spacing: -0.03em;
+    line-height: 1.04;
+  }
+  .pipeline-detail p {
+    margin: 0 0 16px;
+    color: var(--muted);
+    font-size: 0.94rem;
+    line-height: 1.67;
+  }
+  .pipeline-detail p:last-child { margin-bottom: 0; }
+  .pipeline-detail strong { color: var(--ink); }
+  .inline-code {
+    padding: 0.14em 0.38em;
+    background: #eef0eb;
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 0.84em;
+  }
+
+  .implementation-note {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 38px;
+    margin-top: 54px;
+    padding: 30px 0;
+    border-top: 1px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+  }
+  .implementation-note h3 {
+    margin: 0;
+    color: var(--signal-deep);
+    font-family: var(--mono);
+    font-size: 0.76rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .implementation-note p {
+    margin: 0;
+    color: #282b27;
+    line-height: 1.72;
+  }
+
+  .output-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    margin-top: 58px;
+    border: 1px solid var(--ink);
+    background: var(--ink);
+  }
+  .output-card {
+    min-width: 0;
+    background: var(--paper);
+  }
+  .output-media {
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: #090a09;
+  }
+  .output-media img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+  }
+  .output-copy { padding: 24px 26px 28px; }
+  .output-copy span {
+    color: var(--signal-deep);
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    font-weight: 700;
+  }
+  .output-copy h3 {
+    margin: 13px 0 10px;
+    font-family: var(--serif);
+    font-size: 1.8rem;
+    font-weight: 400;
+    letter-spacing: -0.025em;
+  }
+  .output-copy p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.65;
+  }
+
+  .code-shell {
+    margin-top: 52px;
+    border: 1px solid #222;
+    background: #0d0f0d;
+    color: #e8ebe5;
+  }
+  .code-head {
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 0 18px;
+    border-bottom: 1px solid #454844;
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .copy-button {
+    border: 0;
+    background: transparent;
+    color: var(--signal);
+    cursor: pointer;
+    font-family: var(--sans);
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+  .code-shell pre {
+    margin: 0;
+    overflow-x: auto;
+    padding: 28px;
+    color: #e8ebe5;
+    font-family: var(--mono);
+    font-size: clamp(0.76rem, 1.1vw, 0.9rem);
+    line-height: 1.7;
+    white-space: pre-wrap;
+  }
+  .code-accent { color: var(--signal); }
+
+  .parameter-table {
+    width: 100%;
+    margin-top: 42px;
+    border-collapse: collapse;
+    border-top: 2px solid var(--ink);
+  }
+  .parameter-table th,
+  .parameter-table td {
+    padding: 19px 16px;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+    vertical-align: top;
+  }
+  .parameter-table th {
+    color: var(--signal-deep);
+    font-family: var(--mono);
+    font-size: 0.69rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+  .parameter-table td {
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.55;
+  }
+  .parameter-table td:first-child {
+    width: 29%;
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 0.82rem;
+  }
+
+  .failure-list {
+    margin-top: 52px;
+    border-top: 2px solid var(--ink);
+  }
+  .failure-item {
+    display: grid;
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: clamp(34px, 6vw, 86px);
+    padding: 31px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .failure-item h3 {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: clamp(1.45rem, 2.4vw, 2.1rem);
+    font-weight: 400;
+    letter-spacing: -0.025em;
+  }
+  .failure-item p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.92rem;
+    line-height: 1.65;
+  }
+  .failure-item strong { color: var(--ink); }
+
+  .proof-gallery {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 26px;
+    margin-top: 58px;
+  }
+  .proof-card {
+    margin: 0;
+    border-top: 2px solid var(--ink);
+  }
+  .proof-button {
+    width: 100%;
+    display: block;
+    padding: 0;
+    border: 0;
+    background: #080908;
+    cursor: zoom-in;
+  }
+  .proof-card img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    display: block;
+    object-fit: cover;
+    object-position: top left;
+  }
+  .proof-card figcaption {
+    min-height: 92px;
+    padding: 18px 0 0;
+    border-top: 1px solid var(--ink);
+    color: var(--muted);
+    font-size: 0.88rem;
+    line-height: 1.6;
+  }
+  .proof-card figcaption strong {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .verdict {
+    margin-top: 58px;
+    padding: clamp(40px, 6vw, 74px);
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .verdict-label {
+    margin: 0 0 22px;
+    color: var(--signal);
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+  }
+  .verdict blockquote {
+    max-width: 900px;
+    margin: 0;
+    font-family: var(--serif);
+    font-size: clamp(2.5rem, 4.6vw, 4.8rem);
+    font-weight: 400;
+    letter-spacing: -0.045em;
+    line-height: 0.98;
+  }
+  .verdict p:last-child {
+    max-width: 760px;
+    margin: 32px 0 0;
+    color: #c8cbc5;
+    line-height: 1.7;
+  }
+
+  .media-lightbox {
+    width: min(94vw, 1540px);
+    max-width: none;
+    padding: 0;
+    overflow: visible;
+    border: 1px solid #555a53;
+    background: #080908;
+    color: var(--paper);
+  }
+  .media-lightbox::backdrop { background: rgb(0 0 0 / 0.88); }
+  .media-lightbox img {
+    width: 100%;
+    max-height: 88vh;
+    display: block;
+    object-fit: contain;
+  }
+  .lightbox-close {
+    position: absolute;
+    top: -18px;
+    right: -18px;
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    border: 1px solid #8b9188;
+    border-radius: 50%;
+    background: var(--paper);
+    color: var(--ink);
+    font: 700 1.25rem/1 var(--sans);
+    cursor: pointer;
+  }
+  .lightbox-close:hover,
+  .lightbox-close:focus-visible { background: var(--signal); outline: none; }
+
+  .site-footer {
+    overflow: hidden;
+    background: var(--ink);
+    color: var(--paper);
+    padding-top: 72px;
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 44px;
+    padding-bottom: 58px;
+    border-bottom: 1px solid var(--line-dark);
+  }
+  .footer-group h2 {
+    margin: 0 0 18px;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .footer-group a {
+    width: max-content;
+    display: block;
+    margin: 9px 0;
+    color: #bdc1ba;
+    font-size: 0.9rem;
+    text-decoration: none;
+  }
+  .footer-group a:hover,
+  .footer-group a:focus-visible { color: var(--signal); }
+  .footer-wordmark {
+    max-width: 100%;
+    margin: 0;
+    padding: 46px 0 14px;
+    font-size: clamp(3.1rem, 8.4vw, 8.7rem);
+    font-weight: 800;
+    letter-spacing: -0.075em;
+    line-height: 0.78;
+    white-space: nowrap;
+  }
+  .footer-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 30px;
+    padding: 30px 0 36px;
+    color: #7f847c;
+    font-size: 0.78rem;
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity 700ms ease, transform 700ms ease;
+  }
+  .reveal.is-visible { opacity: 1; transform: none; }
+
+  @media (min-width: 1101px) {
+    .doc-hero {
+      padding-block: clamp(30px, 5svh, 64px);
+    }
+  }
+
+  @media (max-height: 850px) and (min-width: 1101px) {
+    .doc-hero h1 {
+      font-size: clamp(4rem, min(6.4vw, 12svh), 6.3rem);
+    }
+    .hero-rule {
+      margin: 24px 0 18px;
+    }
+    .hero-actions {
+      margin-top: 22px;
+    }
+  }
+
+  .button:focus-visible,
+  .copy-button:focus-visible,
+  .proof-button:focus-visible,
+  .nav-links a:focus-visible,
+  .brand:focus-visible,
+  .toc a:focus-visible {
+    outline: 3px solid var(--signal);
+    outline-offset: 4px;
+  }
+
+  @media (max-width: 1100px) {
+    .doc-hero { min-height: auto; }
+    .doc-hero-grid { grid-template-columns: 1fr; }
+    .doc-hero-copy { max-width: 760px; }
+    .signal-proof { max-width: 820px; }
+    .doc-layout {
+      grid-template-columns: 1fr;
+      gap: 64px;
+    }
+    .toc {
+      position: static;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border-bottom: 1px solid var(--ink);
+    }
+    .toc-title { grid-column: 1 / -1; }
+    .toc a { padding-right: 16px; }
+    .pipeline-step {
+      grid-template-columns: 70px minmax(180px, 0.4fr) 1fr;
+    }
+  }
+
+  @media (max-width: 760px) {
+    :root { --section: 82px; }
+    .nav-inner { min-height: 68px; }
+    .nav-links a:not(.nav-github) { display: none; }
+    .brand { font-size: 1.15rem; }
+    .brand-mark { width: 34px; height: 34px; border-radius: 8px; }
+    .doc-hero {
+      padding-block: 58px 72px;
+    }
+    .doc-hero h1 { font-size: clamp(4rem, 19vw, 6rem); }
+    .hero-rule { height: 5px; margin: 28px 0 22px; }
+    .hero-actions { flex-direction: column; }
+    .button { width: 100%; }
+    .signal-proof-grid { grid-template-columns: 1fr; }
+    .signal-proof-panel + .signal-proof-panel { border-left: 0; border-top: 1px solid #454844; }
+    .signal-proof-media { height: 250px; }
+    .toc { grid-template-columns: 1fr 1fr; }
+    .section-title { font-size: clamp(3rem, 15vw, 4.8rem); }
+    .concept-grid,
+    .output-grid,
+    .proof-gallery { grid-template-columns: 1fr; }
+    .pipeline-step {
+      grid-template-columns: 52px 1fr;
+      gap: 18px;
+    }
+    .pipeline-detail { grid-column: 2; }
+    .implementation-note,
+    .failure-item {
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+    .parameter-table { display: block; overflow-x: auto; }
+    .parameter-table th,
+    .parameter-table td { min-width: 150px; }
+    .parameter-table td:first-child { min-width: 190px; }
+    .media-lightbox { width: calc(100vw - 28px); }
+    .lightbox-close { top: 8px; right: 8px; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+    .footer-wordmark {
+      font-size: clamp(2.8rem, 15vw, 5.6rem);
+      white-space: normal;
+      line-height: 0.84;
+    }
+    .footer-meta { flex-direction: column; gap: 6px; }
+  }
+
+  @media (max-width: 460px) {
+    .nav-github span { display: none; }
+    .toc { grid-template-columns: 1fr; }
+    .equation { padding: 22px 18px; }
+    .code-shell pre { padding: 22px 18px; }
+    .footer-grid { grid-template-columns: 1fr; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      scroll-behavior: auto !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+    .reveal { opacity: 1; transform: none; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to documentation</a>
+
+<header class="site-nav">
+  <div class="shell nav-inner">
+    <a class="brand" href="index.html" aria-label="Ghost Font Decoder home">
+      <img class="brand-mark" src="assets/brand-icon.png" alt="" width="40" height="40">
+      <span>Ghost Font Decoder</span>
+    </a>
+    <nav class="nav-links" aria-label="Documentation navigation">
+      <a href="#concept">Concept</a>
+      <a href="#pipeline">Pipeline</a>
+      <a href="#cli">CLI</a>
+      <a href="#proof">Proof</a>
+      <a class="nav-github" href="https://github.com/haroontrailblazer/ghost-font-decoder">
+        <span>GitHub</span>
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M7 17 17 7M8 7h9v9"/>
+        </svg>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <section class="doc-hero" id="top">
+    <div class="shell doc-hero-grid">
+      <div class="doc-hero-copy reveal">
+        <h1>The message is the motion.</h1>
+        <div class="hero-rule" aria-hidden="true"></div>
+        <p class="doc-hero-lede">
+          Ghost fonts hide glyphs in the relationship between video frames.
+          This guide explains the complete decoder: from dense optical flow to
+          drift-compensated evidence, cleaned masks, optional OCR, and agent verification.
+        </p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="#pipeline">
+            Read the pipeline
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M5 12h14M13 6l6 6-6 6"/>
+            </svg>
+          </a>
+          <a class="button button-secondary" href="https://github.com/haroontrailblazer/ghost-font-decoder/blob/main/decode.py">
+            Read decode.py
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M7 17 17 7M8 7h9v9"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <figure class="signal-proof reveal">
+        <div class="signal-proof-head">
+          <span>Same clip · two kinds of evidence</span>
+          <span>Motion recovered</span>
+        </div>
+        <div class="signal-proof-grid">
+          <div class="signal-proof-panel">
+            <div class="signal-proof-media">
+              <img src="assets/paused-frame.png" alt="A paused ghost-font video frame that appears to contain only random dots">
+            </div>
+            <figcaption class="signal-proof-caption">One frame: statistically uniform dots. No readable glyph boundary.</figcaption>
+          </div>
+          <div class="signal-proof-panel">
+            <div class="signal-proof-media">
+              <img src="assets/proof/recovered-binary-mask.png" alt="Binary recovered mask showing I LOVE YOU">
+            </div>
+            <figcaption class="signal-proof-caption">Many frame pairs: registered counter-motion accumulates into letters.</figcaption>
+          </div>
+        </div>
+      </figure>
+    </div>
+  </section>
+
+  <div class="shell doc-layout">
+    <aside class="toc" aria-label="On this page">
+      <p class="toc-title">On this page</p>
+      <a href="#concept"><span>01</span>Signal model</a>
+      <a href="#pipeline"><span>02</span>Decoder pipeline</a>
+      <a href="#implementation"><span>03</span>Implementation</a>
+      <a href="#outputs"><span>04</span>Outputs</a>
+      <a href="#cli"><span>05</span>CLI reference</a>
+      <a href="#failures"><span>06</span>Failure modes</a>
+      <a href="#proof"><span>07</span>Agent proof</a>
+      <a href="#security"><span>08</span>Security meaning</a>
+    </aside>
+
+    <article class="doc-content">
+      <section class="doc-section reveal" id="concept">
+        <p class="section-label">01 · Signal model</p>
+        <h2 class="section-title">Why a still frame contains nothing to read.</h2>
+        <p class="section-intro">
+          A ghost-font clip is a <strong>motion-defined random-dot stimulus</strong>.
+          Foreground dots inside the letter shapes and background dots can share the
+          same brightness, density, size, and spatial distribution. The only separating
+          feature is their velocity across time.
+        </p>
+
+        <div class="concept-grid">
+          <div class="concept-block">
+            <span class="concept-number">A · Appearance</span>
+            <h3>Equal spatial statistics</h3>
+            <p>
+              In a single image, glyph and background samples are drawn from the same
+              visual texture. Thresholding, edge detection, template matching, and raw-frame
+              OCR have no stable boundary to follow.
+            </p>
+          </div>
+          <div class="concept-block">
+            <span class="concept-number">B · Motion</span>
+            <h3>Different temporal vectors</h3>
+            <p>
+              Between frames, background dots follow a dominant translation while dots
+              inside the glyph region move against it. Optical flow turns that temporal
+              difference into a per-pixel vector field.
+            </p>
+          </div>
+          <div class="concept-block">
+            <span class="concept-number">C · Evidence</span>
+            <h3>Weak per pair, strong in aggregate</h3>
+            <p>
+              A single flow estimate is noisy. The same glyph-shaped counter-motion recurs
+              over many frame pairs, while random estimation error is incoherent and
+              averages down during accumulation.
+            </p>
+          </div>
+          <div class="concept-block">
+            <span class="concept-number">D · Registration</span>
+            <h3>The letter region also drifts</h3>
+            <p>
+              Even after background subtraction, the entire glyph region can move across
+              the clip. Each score map must be aligned before summation or the recovered
+              letters smear into broad blobs.
+            </p>
+          </div>
+        </div>
+
+        <div class="equation" aria-label="Core motion opposition equation">
+          <span class="equation-label">Core signal</span>
+          <code>Fₜ(x) = optical flow at pixel x
+bₜ    = medianₓ Fₜ(x)
+rₜ(x) = Fₜ(x) − bₜ
+sₜ(x) = max(0, rₜ(x) · (−bₜ / ‖bₜ‖))</code>
+          <p class="equation-note">
+            The median flow estimates the dominant background because the background covers
+            most of the frame. Positive projection onto the anti-background direction becomes
+            counter-motion evidence. When the background magnitude is below 0.15 pixels, the
+            decoder falls back to residual magnitude instead of dividing by an unstable direction.
+          </p>
+        </div>
+      </section>
+
+      <section class="doc-section reveal" id="pipeline">
+        <p class="section-label">02 · Decoder pipeline</p>
+        <h2 class="section-title">From video frames to readable glyphs.</h2>
+        <p class="section-intro">
+          The production decoder is deliberately classical: OpenCV and NumPy perform
+          the recovery, while OCR is a final optional reader rather than the source of the signal.
+        </p>
+
+        <div class="pipeline">
+          <div class="pipeline-step">
+            <div class="pipeline-number">01</div>
+            <h3>Decode and sample frames</h3>
+            <div class="pipeline-detail">
+              <p>
+                OpenCV reads the video sequentially and converts each selected frame from BGR
+                to grayscale. <span class="inline-code">--stride N</span> keeps every Nth frame;
+                <span class="inline-code">--max-frames</span> caps work on long clips.
+              </p>
+              <p>
+                Grayscale is sufficient because the encoded feature is motion, not color. At
+                least two usable frames are required to form one flow pair.
+              </p>
+            </div>
+          </div>
+
+          <div class="pipeline-step">
+            <div class="pipeline-number">02</div>
+            <h3>Compute dense optical flow</h3>
+            <div class="pipeline-detail">
+              <p>
+                The default DIS preset estimates a two-dimensional motion vector at every pixel
+                between consecutive frames. DIS is fast and robust for dense random-dot textures.
+              </p>
+              <p>
+                Farnebäck is available as a fallback with pyramid scale 0.5, three levels,
+                a 15-pixel window, three iterations, polynomial neighborhood 5, and sigma 1.2.
+              </p>
+            </div>
+          </div>
+
+          <div class="pipeline-step">
+            <div class="pipeline-number">03</div>
+            <h3>Estimate background motion</h3>
+            <div class="pipeline-detail">
+              <p>
+                The per-frame-pair background vector is the median of every flow vector.
+                Because glyph pixels occupy a minority of the image, the median is resistant
+                to their opposing movement.
+              </p>
+              <p>
+                Subtracting this vector removes global translation and leaves residual motion:
+                the information needed to distinguish glyph dots from the field.
+              </p>
+            </div>
+          </div>
+
+          <div class="pipeline-step">
+            <div class="pipeline-number">04</div>
+            <h3>Score counter-motion</h3>
+            <div class="pipeline-detail">
+              <p>
+                Residual vectors are projected onto the direction opposite the background.
+                Negative values are clipped to zero, so only movement opposing the field adds
+                evidence to the candidate glyph mask.
+              </p>
+              <p>
+                This signed score is more selective than raw motion magnitude: ordinary background
+                error does not score merely because it moves.
+              </p>
+            </div>
+          </div>
+
+          <div class="pipeline-step">
+            <div class="pipeline-number">05</div>
+            <h3>Track and cancel glyph drift</h3>
+            <div class="pipeline-detail">
+              <p>
+                Each pair score is blurred with a 31×31 Gaussian kernel. The blur suppresses
+                individual dot noise while preserving the slowly moving glyph region.
+              </p>
+              <p>
+                Phase correlation estimates translation between consecutive smoothed score maps.
+                Updates are accepted only when response exceeds 0.05 and displacement is below
+                30 pixels. Accepted shifts accumulate into a drift vector.
+              </p>
+            </div>
+          </div>
+
+          <div class="pipeline-step">
+            <div class="pipeline-number">06</div>
+            <h3>Register and accumulate</h3>
+            <div class="pipeline-detail">
+              <p>
+                The current score map is warped by the negative cumulative drift, aligning it
+                with the first score map. Registered maps are then summed across the clip.
+              </p>
+              <p>
+                Coherent glyph evidence grows approximately with the number of pairs; uncorrelated
+                noise grows much more slowly. This temporal integration is what makes hidden
+                letter shapes visible.
+              </p>
+            </div>
+          </div>
+
+          <div class="pipeline-step">
+            <div class="pipeline-number">07</div>
+            <h3>Normalize and clean the mask</h3>
+            <div class="pipeline-detail">
+              <p>
+                The accumulated score is scaled using its 99.5th percentile, clipped to 8-bit
+                range, and blurred with a 5×5 Gaussian. Otsu thresholding builds the strong mask.
+              </p>
+              <p>
+                A 7×7 elliptical morphological close fills glyph gaps; an open removes isolated
+                noise. Components smaller than one twenty-thousandth of the image are discarded.
+              </p>
+            </div>
+          </div>
+
+          <div class="pipeline-step">
+            <div class="pipeline-number">08</div>
+            <h3>Recover faint coherent glyphs</h3>
+            <div class="pipeline-detail">
+              <p>
+                A secondary threshold at half the Otsu value looks for lower-energy components.
+                Candidates must be compact, tall enough, large enough, mostly absent from the
+                strong mask, and peak at least 75% of the Otsu level.
+              </p>
+              <p>
+                Width constraints reject scan lines and pan bands. This conservative pass can
+                restore a faint character—such as the isolated “I” in the proof clip—without
+                flooding the mask with background motion.
+              </p>
+            </div>
+          </div>
+
+          <div class="pipeline-step">
+            <div class="pipeline-number">09</div>
+            <h3>Run optional OCR and verify</h3>
+            <div class="pipeline-detail">
+              <p>
+                Tesseract receives the inverted clean mask with page segmentation mode 6. A second
+                uppercase-and-digit-whitelisted pass can replace a punctuation-heavy result.
+              </p>
+              <p>
+                The decoder also checks for the geometry of an isolated uppercase “I”. OCR is never
+                treated as ground truth: the agent inspects both the mask and heatmap and states
+                uncertainty for ambiguous characters.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="doc-section reveal" id="implementation">
+        <p class="section-label">03 · Implementation details</p>
+        <h2 class="section-title">The thresholds are guards, not magic numbers.</h2>
+        <p class="section-intro">
+          Each constraint protects a specific failure boundary: unstable camera motion,
+          low-energy characters, noisy dot-level flow, or OCR that invents punctuation.
+        </p>
+
+        <table class="parameter-table">
+          <thead>
+            <tr>
+              <th>Value</th>
+              <th>Role</th>
+              <th>Why it exists</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>background magnitude &gt; 0.15</td>
+              <td>Use directional opposition score</td>
+              <td>A direction derived from near-zero motion is numerically unstable.</td>
+            </tr>
+            <tr>
+              <td>31×31 Gaussian</td>
+              <td>Prepare maps for phase correlation</td>
+              <td>Suppresses dot-level motion while retaining the glyph-region envelope.</td>
+            </tr>
+            <tr>
+              <td>response &gt; 0.05</td>
+              <td>Accept phase-correlation shift</td>
+              <td>Rejects low-confidence registration estimates.</td>
+            </tr>
+            <tr>
+              <td>shift &lt; 30 px</td>
+              <td>Accept plausible inter-pair drift</td>
+              <td>Large jumps usually represent a bad correlation peak.</td>
+            </tr>
+            <tr>
+              <td>99.5th percentile</td>
+              <td>Normalize accumulated score</td>
+              <td>Prevents a few extreme pixels from compressing the useful heatmap range.</td>
+            </tr>
+            <tr>
+              <td>7×7 close/open</td>
+              <td>Clean strong binary mask</td>
+              <td>Joins broken strokes and removes small texture remnants at glyph scale.</td>
+            </tr>
+            <tr>
+              <td>0.5 × Otsu</td>
+              <td>Faint-component threshold</td>
+              <td>Searches below the global threshold without admitting the full noise floor.</td>
+            </tr>
+            <tr>
+              <td>component width ≤ 4 × height</td>
+              <td>Faint-glyph compactness check</td>
+              <td>Rejects wide horizontal bands caused by scanning or camera translation.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="implementation-note">
+          <h3>Complexity</h3>
+          <p>
+            For N selected frames of width W and height H, the dominant cost is dense optical flow:
+            approximately O(NWH) work and O(WH) live memory for the current frames, flow, score maps,
+            and accumulator. The implementation streams frames; it does not hold the whole video in RAM.
+          </p>
+        </div>
+
+        <div class="implementation-note">
+          <h3>Trust boundary</h3>
+          <p>
+            The algorithm runs locally in the environment executing the skill. No model weights are
+            needed for recovery, and the video is not required to leave that environment. OCR can be
+            disabled entirely with <span class="inline-code">--no-ocr</span>.
+          </p>
+        </div>
+      </section>
+
+      <section class="doc-section reveal" id="outputs">
+        <p class="section-label">04 · Outputs</p>
+        <h2 class="section-title">Two images answer two different questions.</h2>
+        <p class="section-intro">
+          The clean mask answers “what can be read confidently?” The heatmap answers
+          “where does the motion evidence exist, including weaker characters?”
+        </p>
+
+        <div class="output-grid">
+          <article class="output-card">
+            <div class="output-media">
+              <img src="../examples/revealed.png" alt="Clean binary mask revealing HELLO HUMAN" loading="lazy">
+            </div>
+            <div class="output-copy">
+              <span>revealed.png</span>
+              <h3>Clean binary mask</h3>
+              <p>
+                High-contrast output for direct inspection and OCR. Morphology and component
+                filtering prioritize readable shapes over weak evidence.
+              </p>
+            </div>
+          </article>
+          <article class="output-card">
+            <div class="output-media">
+              <img src="../examples/revealed_heatmap.png" alt="Raw accumulated opposition heatmap revealing HELLO HUMAN" loading="lazy">
+            </div>
+            <div class="output-copy">
+              <span>revealed_heatmap.png</span>
+              <h3>Raw opposition heatmap</h3>
+              <p>
+                Normalized accumulated score before binary thresholding. It preserves faint
+                glyph evidence that may sit below the global Otsu cutoff.
+              </p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="doc-section reveal" id="cli">
+        <p class="section-label">05 · CLI reference</p>
+        <h2 class="section-title">Run the same decoder without an agent.</h2>
+        <p class="section-intro">
+          Python 3.8+, OpenCV, and NumPy are required. Tesseract and pytesseract are optional.
+          The images are still generated when OCR is unavailable.
+        </p>
+
+        <div class="code-shell">
+          <div class="code-head">
+            <span>Install and decode</span>
+            <button class="copy-button" type="button" data-copy="cli-basic">Copy</button>
+          </div>
+          <pre id="cli-basic">pip install -r requirements.txt
+python decode.py examples/ghost-message.mp4</pre>
+        </div>
+
+        <div class="code-shell">
+          <div class="code-head">
+            <span>Tuned run</span>
+            <button class="copy-button" type="button" data-copy="cli-tuned">Copy</button>
+          </div>
+          <pre id="cli-tuned">python decode.py VIDEO \
+  -o OUT_DIR \
+  --method farneback \
+  --stride 2 \
+  --max-frames 200 \
+  --no-ocr</pre>
+        </div>
+
+        <table class="parameter-table">
+          <thead>
+            <tr>
+              <th>Argument</th>
+              <th>Default</th>
+              <th>Behavior</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>video</td>
+              <td>required</td>
+              <td>Path to MP4, MOV, AVI, WebM, or any format readable by the installed OpenCV build.</td>
+            </tr>
+            <tr>
+              <td>-o, --out-dir</td>
+              <td>current directory</td>
+              <td>Destination for revealed.png and revealed_heatmap.png.</td>
+            </tr>
+            <tr>
+              <td>--method</td>
+              <td>dis</td>
+              <td>Selects DIS or Farnebäck dense optical flow.</td>
+            </tr>
+            <tr>
+              <td>--stride</td>
+              <td>1</td>
+              <td>Processes every Nth frame. Use 2 for high-frame-rate clips or faster diagnostics.</td>
+            </tr>
+            <tr>
+              <td>--max-frames</td>
+              <td>unlimited</td>
+              <td>Stops after a fixed number of selected frames. A few seconds is usually sufficient.</td>
+            </tr>
+            <tr>
+              <td>--no-ocr</td>
+              <td>false</td>
+              <td>Skips Tesseract while preserving both visual outputs.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="doc-section reveal" id="failures">
+        <p class="section-label">06 · Failure modes</p>
+        <h2 class="section-title">What weak evidence means—and what to try next.</h2>
+
+        <div class="failure-list">
+          <div class="failure-item">
+            <h3>Uniformly dark heatmap</h3>
+            <p>
+              The clip may not contain coherent counter-motion, may have too few usable frames,
+              or may use a different hiding mechanism. <strong>Confirm the video actually moves</strong>
+              and process a longer interval.
+            </p>
+          </div>
+          <div class="failure-item">
+            <h3>Letters smear into bands</h3>
+            <p>
+              Drift registration likely failed or the clip contains non-translational camera motion.
+              Try Farnebäck, reduce stride, or inspect whether rotation and scale changes violate the
+              translation-only registration model.
+            </p>
+          </div>
+          <div class="failure-item">
+            <h3>Mask is weak or empty</h3>
+            <p>
+              Retry with <span class="inline-code">--method farneback</span>. For high-frame-rate
+              clips, <span class="inline-code">--stride 2</span> can increase displacement between
+              sampled frames and improve the flow signal.
+            </p>
+          </div>
+          <div class="failure-item">
+            <h3>One character is missing</h3>
+            <p>
+              Inspect the heatmap before concluding the character is absent. The clean Otsu mask is
+              intentionally conservative; the faint-component recovery may still reject a weak or
+              unusually shaped glyph.
+            </p>
+          </div>
+          <div class="failure-item">
+            <h3>OCR disagrees with the image</h3>
+            <p>
+              Trust visual evidence over OCR. Tesseract sees only the final binary geometry and can
+              confuse broken strokes. The agent workflow requires opening the mask and heatmap,
+              verifying the text, and marking ambiguous characters.
+            </p>
+          </div>
+          <div class="failure-item">
+            <h3>Tesseract is unavailable</h3>
+            <p>
+              This is not a decoding failure. The computer-vision pipeline still writes both images.
+              Read the clean mask directly or install Tesseract later; use <span class="inline-code">--no-ocr</span>
+              to skip the check explicitly.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="doc-section reveal" id="proof">
+        <p class="section-label">07 · Agent proof</p>
+        <h2 class="section-title">The screenshots are executions, not mockups.</h2>
+        <p class="section-intro">
+          Claude Code, Claude.ai, and Codex each ran the decoder against motion-hidden
+          text, inspected generated evidence, and reported the recovered message.
+          Select an image to inspect it at full resolution.
+        </p>
+
+        <div class="proof-gallery">
+          <figure class="proof-card">
+            <button class="proof-button" type="button" data-image="assets/proof/claude-code-decoded.png" aria-label="Open Claude Code proof at full resolution">
+              <img src="assets/proof/claude-code-decoded.png" alt="Claude Code reporting I LOVE YOU after processing 185 frame pairs" loading="lazy">
+            </button>
+            <figcaption>
+              <strong>Claude Code</strong>
+              Ran the decoder across 185 frame pairs, inspected the mask and heatmap, and recovered a faint “I”.
+            </figcaption>
+          </figure>
+
+          <figure class="proof-card">
+            <button class="proof-button" type="button" data-image="assets/proof/codex-decoded.png" aria-label="Open Codex proof at full resolution">
+              <img src="assets/proof/codex-decoded.png" alt="Codex task showing the recovered I LOVE YOU message and output links" loading="lazy">
+            </button>
+            <figcaption>
+              <strong>Codex</strong>
+              Invoked the installed skill, displayed the recovered mask, stated the decoded text, and linked both outputs.
+            </figcaption>
+          </figure>
+
+          <figure class="proof-card">
+            <button class="proof-button" type="button" data-image="assets/proof/claude-ai-decoded.png" aria-label="Open Claude.ai decode proof at full resolution">
+              <img src="assets/proof/claude-ai-decoded.png" alt="Claude.ai reporting the decoded hidden message I LOVE YOU" loading="lazy">
+            </button>
+            <figcaption>
+              <strong>Claude.ai</strong>
+              Used the uploadable skill from chat and returned the hidden message with its generated evidence files.
+            </figcaption>
+          </figure>
+
+          <figure class="proof-card">
+            <button class="proof-button" type="button" data-image="assets/proof/claude-ai-reveal.png" aria-label="Open recovered mask proof at full resolution">
+              <img src="assets/proof/claude-ai-reveal.png" alt="Claude.ai displaying the clean mask revealing I LOVE YOU" loading="lazy">
+            </button>
+            <figcaption>
+              <strong>Recovered mask</strong>
+              The final binary output exposes the three-line message while preserving the faint isolated character.
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="doc-section reveal" id="security">
+        <p class="section-label">08 · Security meaning</p>
+        <h2 class="section-title">Obfuscation changes the sensor, not the information.</h2>
+        <p class="section-intro">
+          Ghost fonts can defeat tools that inspect only individual images, but they do not
+          remove the signal. They move it from spatial appearance into temporal correspondence.
+        </p>
+
+        <div class="verdict">
+          <p class="verdict-label">Technical verdict</p>
+          <blockquote>
+            If a human can recover the letters from motion, a system that measures motion can recover them too.
+          </blockquote>
+          <p>
+            Dense optical flow and phase correlation are established computer-vision methods.
+            The decoder does not need a language model to infer the hidden phrase, and it does
+            not break encryption because no encryption exists. It reconstructs a deliberately
+            preserved visual signal from the dimension in which that signal was encoded.
+          </p>
+        </div>
+      </section>
+    </article>
+  </div>
+</main>
+
+<dialog class="media-lightbox" id="proof-lightbox" aria-label="Full-resolution proof image">
+  <button class="lightbox-close" type="button" aria-label="Close full-resolution image">×</button>
+  <img src="assets/proof/codex-decoded.png" alt="">
+</dialog>
+
+<footer class="site-footer">
+  <div class="shell">
+    <div class="footer-grid">
+      <div class="footer-group">
+        <h2>Documentation</h2>
+        <a href="#concept">Signal model</a>
+        <a href="#pipeline">Pipeline</a>
+        <a href="#cli">CLI reference</a>
+        <a href="#failures">Failure modes</a>
+      </div>
+      <div class="footer-group">
+        <h2>Outputs</h2>
+        <a href="#outputs">Revealed mask</a>
+        <a href="#outputs">Motion heatmap</a>
+        <a href="#proof">Agent proof</a>
+      </div>
+      <div class="footer-group">
+        <h2>Project</h2>
+        <a href="index.html">Project home</a>
+        <a href="https://github.com/haroontrailblazer/ghost-font-decoder">Source</a>
+        <a href="https://github.com/haroontrailblazer/ghost-font-decoder/blob/main/LICENSE">MIT License</a>
+      </div>
+      <div class="footer-group">
+        <h2>Author</h2>
+        <a href="https://haroon.pro">Haroon K M</a>
+        <a href="https://github.com/haroontrailblazer">@haroontrailblazer</a>
+      </div>
+    </div>
+
+    <p class="footer-wordmark" aria-label="Read the motion">READ THE MOTION</p>
+    <div class="footer-meta">
+      <span>© 2026 Haroon K M · MIT License</span>
+      <span>Technical documentation for motion-hidden text recovery.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(() => {
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const lightbox = document.getElementById("proof-lightbox");
+  const lightboxImage = lightbox?.querySelector("img");
+  const lightboxClose = lightbox?.querySelector(".lightbox-close");
+
+  document.querySelectorAll(".proof-button").forEach((button) => {
+    button.addEventListener("click", () => {
+      if (!lightbox || !lightboxImage) return;
+      const preview = button.querySelector("img");
+      lightboxImage.src = button.dataset.image;
+      lightboxImage.alt = preview?.alt || "Full-resolution execution proof";
+      lightbox.showModal();
+    });
+  });
+  lightboxClose?.addEventListener("click", () => lightbox?.close());
+  lightbox?.addEventListener("click", (event) => {
+    if (event.target === lightbox) lightbox.close();
+  });
+
+  document.querySelectorAll(".copy-button").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const target = document.getElementById(button.dataset.copy);
+      if (!target) return;
+      try {
+        await navigator.clipboard.writeText(target.innerText.trim());
+        button.textContent = "Copied";
+      } catch {
+        const range = document.createRange();
+        range.selectNodeContents(target);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        const copied = typeof document.execCommand === "function" && document.execCommand("copy");
+        button.textContent = copied ? "Copied" : "Selected";
+      }
+      window.setTimeout(() => { button.textContent = "Copy"; }, 1800);
+    });
+  });
+
+  if (!reduceMotion && "IntersectionObserver" in window) {
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08 });
+    document.querySelectorAll(".reveal").forEach((element) => revealObserver.observe(element));
+
+    const tocLinks = new Map(
+      Array.from(document.querySelectorAll(".toc a")).map((link) => [
+        link.getAttribute("href").slice(1),
+        link
+      ])
+    );
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        tocLinks.forEach((link) => link.classList.remove("is-active"));
+        tocLinks.get(entry.target.id)?.classList.add("is-active");
+      });
+    }, { rootMargin: "-18% 0px -68% 0px" });
+    document.querySelectorAll(".doc-section[id]").forEach((section) => sectionObserver.observe(section));
+  } else {
+    document.querySelectorAll(".reveal").forEach((element) => element.classList.add("is-visible"));
+  }
+})();
+</script>
+</body>
+</html>
