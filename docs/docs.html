@@ -1292,7 +1292,7 @@ sₜ(x) = max(0, rₜ(x) · (−bₜ / ‖bₜ‖))</code>
         <div class="output-grid">
           <article class="output-card">
             <div class="output-media">
-              <img src="../examples/revealed.png" alt="Clean binary mask revealing HELLO HUMAN" loading="lazy">
+              <img src="assets/revealed.png" alt="Clean binary mask revealing HELLO HUMAN" loading="lazy">
             </div>
             <div class="output-copy">
               <span>revealed.png</span>
@@ -1305,7 +1305,7 @@ sₜ(x) = max(0, rₜ(x) · (−bₜ / ‖bₜ‖))</code>
           </article>
           <article class="output-card">
             <div class="output-media">
-              <img src="../examples/revealed_heatmap.png" alt="Raw accumulated opposition heatmap revealing HELLO HUMAN" loading="lazy">
+              <img src="assets/revealed_heatmap.png" alt="Raw accumulated opposition heatmap revealing HELLO HUMAN" loading="lazy">
             </div>
             <div class="output-copy">
               <span>revealed_heatmap.png</span>
@@ -1333,7 +1333,7 @@ sₜ(x) = max(0, rₜ(x) · (−bₜ / ‖bₜ‖))</code>
             <button class="copy-button" type="button" data-copy="cli-basic">Copy</button>
           </div>
           <pre id="cli-basic">pip install -r requirements.txt
-python decode.py examples/ghost-message.mp4</pre>
+python decode.py docs/assets/ghost-message.mp4</pre>
         </div>
 
         <div class="code-shell">
@@ -1341,8 +1341,8 @@ python decode.py examples/ghost-message.mp4</pre>
             <span>Tuned run</span>
             <button class="copy-button" type="button" data-copy="cli-tuned">Copy</button>
           </div>
-          <pre id="cli-tuned">python decode.py VIDEO \
-  -o OUT_DIR \
+          <pre id="cli-tuned">python decode.py docs/assets/ghost-message.mp4 \
+  -o docs/assets/ \
   --method farneback \
   --stride 2 \
   --max-frames 200 \
