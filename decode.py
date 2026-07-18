@@ -111,15 +111,45 @@ def accumulate_opposition(frames, flow_fn):
 
 
 def reveal_mask(score):
-    """Turn the accumulated score map into a clean binary text mask."""
+    """Build a strong mask, then recover coherent lower-energy glyphs."""
     score = np.clip(score, 0, None)
     hi = np.percentile(score, 99.5)
     norm = np.clip(score / hi * 255, 0, 255).astype(np.uint8) if hi > 0 else score.astype(np.uint8)
     norm = cv2.GaussianBlur(norm, (5, 5), 0)
-    _, mask = cv2.threshold(norm, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    otsu, mask = cv2.threshold(norm, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
     mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
     mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+
+    # A weak glyph can peak just below global Otsu while remaining far brighter
+    # than its background. Recover only new, compact components; wide scan-line
+    # and camera-pan bands are rejected.
+    faint_cutoff = max(8, int(round(otsu * 0.5)))
+    _, faint = cv2.threshold(norm, faint_cutoff, 255, cv2.THRESH_BINARY)
+    faint_kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
+    faint = cv2.morphologyEx(faint, cv2.MORPH_CLOSE, faint_kernel)
+    n, labels, stats, _ = cv2.connectedComponentsWithStats(faint)
+    height, width = mask.shape
+    min_faint_area = max(20, mask.size // 4000)
+    min_faint_height = max(5, height // 40)
+    min_faint_peak = max(faint_cutoff + 1, int(round(otsu * 0.75)))
+    recovered = 0
+    for i in range(1, n):
+        _, _, w, h, area = stats[i]
+        component = labels == i
+        peak = int(norm[component].max())
+        strong_overlap = np.count_nonzero(mask[component]) / area
+        compact = w <= 4 * h and w <= width // 3
+        coherent = area >= min_faint_area and h >= min_faint_height
+        if compact and coherent and strong_overlap < 0.1 and peak >= min_faint_peak:
+            mask[component] = 255
+            recovered += 1
+    if recovered:
+        print(
+            f"  recovered {recovered} faint coherent component(s) "
+            f"below Otsu ({faint_cutoff} vs {otsu:.0f})"
+        )
+
     n, labels, stats, _ = cv2.connectedComponentsWithStats(mask)
     min_area = mask.size // 20000
     for i in range(1, n):
@@ -142,6 +172,31 @@ def find_tesseract():
     return None
 
 
+def has_isolated_i(mask):
+    """Recognize a recovered uppercase I that page-layout OCR may ignore."""
+    n, _, stats, _ = cv2.connectedComponentsWithStats(mask)
+    height, width = mask.shape
+    min_area = max(20, mask.size // 4000)
+    components = [
+        stats[i] for i in range(1, n)
+        if stats[i, cv2.CC_STAT_AREA] >= min_area
+    ]
+    for x, y, w, h, area in components:
+        aspect = w / h
+        fill = area / (w * h)
+        if aspect > 0.5 or fill < 0.45 or h < height // 10:
+            continue
+        cx = x + w / 2
+        below = [item for item in components if item[1] > y + h * 0.75]
+        if len(below) < 2:
+            continue
+        below_left = min(item[0] for item in below)
+        below_right = max(item[0] + item[2] for item in below)
+        if below_left <= cx <= below_right and width * 0.1 < cx < width * 0.9:
+            return True
+    return False
+
+
 def run_ocr(mask):
     try:
         import pytesseract
@@ -155,6 +210,22 @@ def run_ocr(mask):
     pytesseract.pytesseract.tesseract_cmd = exe
     ocr_img = cv2.bitwise_not(mask)  # tesseract wants dark text on white
     text = pytesseract.image_to_string(ocr_img, config="--psm 6").strip()
+    uppercase = pytesseract.image_to_string(
+        ocr_img,
+        config="--psm 6 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+    ).strip()
+    alnum = lambda value: sum(char.isalnum() for char in value)
+    has_punctuation_token = any(
+        not any(char.isalnum() for char in token) for token in text.split()
+    )
+    if uppercase and has_punctuation_token and alnum(uppercase) >= alnum(text):
+        text = uppercase
+    text = " ".join(
+        token for token in text.split()
+        if any(char.isalnum() for char in token)
+    )
+    if text and has_isolated_i(mask) and text.split()[0].upper() != "I":
+        text = "I " + text
     return text or None
 
 

@@ -34,16 +34,18 @@ revealed image, and replies with `Text in the video: <decoded text>`.
 
 ## What's inside
 
-- `ghost-decode/SKILL.md` — the skill instructions (also embeds the full decoder
-  as a fallback, so it works even if the bundled file is not found).
-- `ghost-decode/decode.py` — the decoder: dense optical flow → background
-  subtraction → drift registration → accumulate → clean mask → optional OCR.
+- `ghost-decode/SKILL.md` — self-contained: the instructions **and** the decoder
+  (dense optical flow → background subtraction → drift registration → accumulate
+  → colormapped heatmap). Claude writes the decoder to a file, runs it once, and
+  reads the word from the heatmap. No separate files needed.
 
 ## Notes
 
 - The sandbox installs `opencv-python-headless` and `numpy` automatically.
-- Tesseract OCR usually isn't present in the sandbox; that's fine — Claude reads
-  the revealed image directly, which is reliable.
+- The skill is deliberately minimal: run once, read the revealed heatmap, report
+  `Text in the video: <text>`. It explicitly tells Claude **not** to crop,
+  enhance, re-decode, or explain — the accumulated heatmap already shows the
+  letters as soft glowing shapes.
 - Same decoder ships as a `/ghost-decode` command + skill for **Claude Code** and
   a `$ghost-decode` skill for **Codex**. See the repository root README.
 

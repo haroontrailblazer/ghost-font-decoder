@@ -17,7 +17,7 @@ Recover motion-defined text with the decoder bundled at the plugin root.
 ## Workflow
 
 1. Resolve the input video from the user's request. If no path is supplied, search the working directory for a recently modified `.mp4`, `.mov`, `.avi`, or `.webm` file. Ask only if more than one candidate is plausible.
-2. Determine `<plugin-root>` from this skill's installed location. This file is at `<plugin-root>/skills/ghost-decode/SKILL.md`; do not assume the plugin is installed in or invoked from the current working directory.
+2. Determine `<plugin-root>` from this skill's installed location. This file is at `<plugin-root>/codex-skills/ghost-decode/SKILL.md`; do not assume the plugin is installed in or invoked from the current working directory.
 3. Check the runtime with:
 
    ```text
@@ -31,7 +31,7 @@ Recover motion-defined text with the decoder bundled at the plugin root.
    python "<plugin-root>/decode.py" "<video-path>" -o "<output-dir>"
    ```
 
-5. Inspect both generated files. Prefer `revealed.png`; use `revealed_heatmap.png` when the cleaned mask loses faint letter detail.
+5. Inspect both generated files. Prefer `revealed.png`; use `revealed_heatmap.png` to verify the decoder's conservative faint-glyph recovery when a lower-energy character would fall below the main Otsu threshold.
 6. If the command prints `Text in the video:`, visually verify the OCR result against the revealed image. If OCR is unavailable or disagrees with the image, read the image directly.
 7. Reply using the required chat format below. State uncertainty beside any ambiguous character.
 
@@ -60,8 +60,9 @@ run in a chat without the plugin installed — reproduce the decoder yourself:
 write the complete Python program from `prompts/decode-in-chat.md` (at the
 plugin root) to a temporary file and run it on the video with the same steps.
 Do not merely paste or describe the program without executing it. The algorithm
-is identical: dense optical flow, median background subtraction,
-phase-correlation drift registration, accumulation, Otsu threshold, then OCR.
+uses dense optical flow, median background subtraction, phase-correlation drift
+registration, accumulation, a strong Otsu mask plus conservative faint-glyph
+recovery, then OCR.
 Never OCR a raw frame — every frame is noise.
 
 ## Troubleshooting
