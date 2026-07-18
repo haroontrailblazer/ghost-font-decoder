@@ -32,7 +32,7 @@ Recover motion-defined text with the decoder bundled at the plugin root.
    ```
 
 5. Inspect both generated files. Prefer `revealed.png`; use `revealed_heatmap.png` when the cleaned mask loses faint letter detail.
-6. If the command prints `Hidden message:`, visually verify the OCR result against the revealed image. If OCR is unavailable or disagrees with the image, read the image directly.
+6. If the command prints `Text in the video:`, visually verify the OCR result against the revealed image. If OCR is unavailable or disagrees with the image, read the image directly.
 7. Reply using the required chat format below. State uncertainty beside any ambiguous character.
 
 ## Required chat response

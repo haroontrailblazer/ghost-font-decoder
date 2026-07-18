@@ -8,6 +8,13 @@ argument-hint: "[video-path]"
 
 Ghost-font videos hide a message as a random-dot field: every frame is uniform noise, but dots inside the letter shapes move against the background dots. The bundled decoder recovers the message from dense optical flow.
 
+## Required behavior
+
+- **Actually execute the Python decoder.** Do not stop at explaining the algorithm, suggesting a command, or returning file paths — run it and read its output.
+- Use the bundled `decode.py` when present. If it is unavailable, write the complete program from `${CLAUDE_PLUGIN_ROOT}/prompts/decode-in-chat.md` to a scratch `.py` file and execute that.
+- Produce and inspect `revealed.png` (and `revealed_heatmap.png`).
+- A successful reply must state the recovered text explicitly using the format below. Paths or the algorithm alone are not a successful result.
+
 ## Steps
 
 1. Resolve the video path: use `$ARGUMENTS` or the path in the user's request. If none given, look for a recently modified video file (`.mp4`, `.mov`, `.avi`, `.webm`) in the working directory; ask only if more than one candidate is plausible.
@@ -19,19 +26,30 @@ Ghost-font videos hide a message as a random-dot field: every frame is uniform n
    ```
 
    `${CLAUDE_PLUGIN_ROOT}` is the plugin's install directory, not the working directory. On Windows PowerShell it is `$env:CLAUDE_PLUGIN_ROOT` — if that expands empty, substitute the install path literally.
-4. If the output contains `Hidden message:`, Read `revealed.png` with vision to confirm the OCR matches the image, then report the text.
-5. If OCR was skipped (no Tesseract engine) or disagrees with the image, report what you see in `revealed.png`. The heatmap `revealed_heatmap.png` preserves faint letter detail the cleaned mask may lose.
-6. Tell the user the hidden message and the absolute paths of both output images; note any characters you are unsure about.
+4. If the output contains `Text in the video:`, Read `revealed.png` with vision to confirm the OCR matches the image.
+5. If OCR was skipped (no Tesseract engine) or disagrees with the image, read the recovered text yourself from `revealed.png`. The heatmap `revealed_heatmap.png` preserves faint letter detail the cleaned mask may lose.
+6. Reply using the required response format below. Note any characters you are unsure about.
+
+## Required response format
+
+Every successful decode must include, at minimum, the recovered text on its own line exactly like this:
+
+```markdown
+Text in the video: **<RECOVERED TEXT>**
+```
+
+Then also give the user the absolute paths of `revealed.png` and `revealed_heatmap.png`, and the exact command you ran. Do not claim the decode succeeded if the program did not run or the revealed image was not inspected.
 
 ## No-install / chat fallback
 
 If `${CLAUDE_PLUGIN_ROOT}/decode.py` is not present — for example this skill's
 steps are being run in a chat without the plugin installed — reproduce the
-decoder yourself: write the Python program from `prompts/decode-in-chat.md`
-(bundled at the plugin root) to a temporary file and run it on the video with
-the same steps. The algorithm is identical: dense optical flow, median
-background subtraction, phase-correlation drift registration, accumulation,
-Otsu threshold, then OCR. Never OCR a raw frame — every frame is noise.
+decoder yourself: write the complete Python program from
+`prompts/decode-in-chat.md` (bundled at the plugin root) to a temporary file and
+**run it** on the video with the same steps. Do not merely paste or describe the
+program without executing it. The algorithm is identical: dense optical flow,
+median background subtraction, phase-correlation drift registration,
+accumulation, Otsu threshold, then OCR. Never OCR a raw frame — every frame is noise.
 
 ## Troubleshooting
 

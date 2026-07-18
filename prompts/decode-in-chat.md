@@ -19,10 +19,11 @@ invisible in any single frame. Do NOT try to OCR a raw frame — it will fail.
 Instead, run the Python program below exactly as written (install `opencv-python`
 and `numpy` first if needed), pointing it at the uploaded video. Then:
 
-1. Read the printed `Hidden message:` value.
+1. Read the printed `Text in the video:` value.
 2. Open `revealed.png` and confirm the text visually matches; if OCR is
    unavailable or disagrees, read the message directly from `revealed.png`.
-3. Reply with the hidden message and show `revealed.png`.
+3. Reply with the recovered text on its own line as `Text in the video: <decoded text>`
+   and show `revealed.png`.
 
 ```python
 # Ghost-font decoder — dense optical flow + drift registration + OCR.
@@ -109,7 +110,7 @@ heat, mask = reveal(score)
 cv2.imwrite(os.path.join(OUT, "revealed_heatmap.png"), heat)
 cv2.imwrite(os.path.join(OUT, "revealed.png"), mask)
 text = ocr(mask)
-print("Hidden message:\n" + text if text else "OCR unavailable — open revealed.png and read it.")
+print("Text in the video: " + " ".join(text.split()) if text else "OCR unavailable — open revealed.png and read it.")
 ```
 
 If the mask is weak or empty, replace the DIS flow with Farnebäck

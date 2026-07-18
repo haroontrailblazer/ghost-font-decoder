@@ -39,7 +39,7 @@ the motion directly with dense optical flow and tells you what the video says.
 
 ```text
 pip install -r requirements.txt
-python decode.py examples/ghost-message.mp4     # prints: HELLO HUMAN
+python decode.py examples/ghost-message.mp4     # prints: Text in the video: HELLO HUMAN
 ```
 
 **Any chat — no install:** paste [`prompts/decode-in-chat.md`](prompts/decode-in-chat.md)

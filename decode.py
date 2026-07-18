@@ -183,12 +183,12 @@ def main():
     if not args.no_ocr:
         text = run_ocr(mask)
         if text:
-            print("\nHidden message:")
-            print(text)
+            single_line = " ".join(text.split())  # collapse OCR line breaks
+            print("\nText in the video: " + single_line)
         elif text is None:
-            pass  # reason already printed
+            pass  # reason already printed (no OCR engine)
         else:
-            print("OCR ran but found no text — check revealed.png visually")
+            print("\nText in the video: (none found — check revealed.png visually)")
 
 
 if __name__ == "__main__":

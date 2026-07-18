@@ -1,12 +1,12 @@
 {
   "name": "ghost-font-decoder",
   "displayName": "Ghost Font Decoder",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "skills": "./claude-skills/",
   "description": "Reveal text hidden in ghost-font videos (motion-defined dot text) using optical flow and OCR",
   "author": {
-    "name": "baskaran",
-    "email": "baskaran@closefuture.io"
+    "name": "Haroon K M",
+    "email": "haroonint144@gmail.com"
   },
   "homepage": "https://github.com/haroontrailblazer/ghost-font-decoder",
   "repository": "https://github.com/haroontrailblazer/ghost-font-decoder",
