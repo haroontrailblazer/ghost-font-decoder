@@ -22,14 +22,25 @@ the motion directly with dense optical flow and tells you what the video says.
 
 ## Quick start
 
-**Claude Code** — two commands, then just ask:
+Same skill name — `ghost-decode` — across all three tools.
+
+**Claude Code** — two commands, then run the slash command (or just ask):
 
 ```text
 /plugin marketplace add haroontrailblazer/ghost-font-decoder
 /plugin install ghost-font-decoder@ghost-font-tools
 ```
 
+```text
+/ghost-decode path/to/ghost-video.mp4
+```
+
 > what does ghost-video.mp4 say?
+
+**claude.ai** — download [`claude-ai-skill/ghost-decode.zip`](claude-ai-skill/ghost-decode.zip)
+and upload it in **Settings → Capabilities → Skills**, then attach a video and ask:
+
+> What does this video say?
 
 **Codex** — add this repo as a plugin source, install `ghost-font-decoder`, then:
 
