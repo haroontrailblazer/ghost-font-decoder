@@ -759,6 +759,89 @@
   }
   .reveal.is-visible { opacity: 1; transform: none; }
 
+  @media (min-width: 1101px) {
+    .hero,
+    #what > .intro-grid,
+    .process,
+    .claim .section,
+    #install {
+      min-height: calc(100svh - 82px);
+    }
+
+    #what {
+      padding-block: 0;
+    }
+    #what > .intro-grid {
+      align-items: center;
+      padding-block: clamp(32px, 6svh, 72px);
+    }
+    .section-title {
+      font-size: clamp(2.7rem, min(5.2vw, 9svh), 5.5rem);
+    }
+    .intro-copy .body-copy {
+      margin-top: clamp(22px, 4svh, 38px);
+    }
+
+    .process {
+      display: grid;
+      align-content: center;
+      padding-top: clamp(32px, 5svh, 64px);
+      padding-bottom: clamp(32px, 5svh, 64px);
+    }
+    .process-heading {
+      padding-bottom: clamp(20px, 4svh, 40px);
+    }
+    .process-rail {
+      align-items: stretch;
+    }
+    .process-step {
+      min-height: clamp(200px, 29svh, 280px);
+      padding-top: clamp(42px, 7svh, 54px);
+      padding-bottom: clamp(22px, 4svh, 38px);
+    }
+    .process-step h3 {
+      margin-top: clamp(22px, 4svh, 34px);
+      margin-bottom: clamp(10px, 2svh, 16px);
+    }
+
+    .claim .section {
+      align-items: center;
+      padding-block: clamp(28px, 5svh, 64px);
+    }
+    .claim-copy h2 {
+      font-size: clamp(2.7rem, min(4.1vw, 7svh), 5rem);
+    }
+    .claim-copy .body-copy {
+      margin-top: clamp(20px, 4svh, 36px);
+    }
+    .claim-note {
+      margin-top: clamp(20px, 4svh, 34px);
+      padding-top: clamp(16px, 3svh, 26px);
+    }
+    .verdict-item {
+      padding-block: clamp(14px, 2.5svh, 28px);
+    }
+    .verdict-item p {
+      margin-top: clamp(10px, 2svh, 16px);
+    }
+
+    #install {
+      display: grid;
+      align-content: center;
+      padding-block: clamp(28px, 5svh, 64px);
+    }
+    .install-header {
+      margin-bottom: clamp(18px, 3.5svh, 36px);
+    }
+    .install-row {
+      min-height: clamp(70px, 10svh, 104px);
+      padding-block: clamp(8px, 1.5svh, 14px);
+    }
+    .code-block {
+      padding: clamp(10px, 2svh, 18px) 20px;
+    }
+  }
+
   @media (max-height: 800px) and (min-width: 901px) {
     .hero {
       min-height: calc(100svh - 82px);
@@ -772,6 +855,100 @@
     .decoder-window { height: 490px; }
     .decoded-message { padding-block: 20px; }
     #scramble { font-size: clamp(2rem, 3.7vw, 3.5rem); }
+  }
+
+  @media (max-height: 720px) and (min-width: 1101px) {
+    .hero {
+      padding-block: 28px 32px;
+    }
+    .hero-copy h1 {
+      font-size: clamp(4rem, min(6.8vw, 11svh), 6.2rem);
+    }
+    .hero-rule { margin: 20px 0 16px; }
+    .hero-actions { margin-top: 18px; }
+    .decoder-window {
+      height: min(420px, calc(100svh - 122px));
+      grid-template-rows: 42px minmax(0, 1fr) 42px 132px;
+    }
+    .decoder-bar,
+    .decoder-output-label { min-height: 42px; }
+
+    #what > .intro-grid,
+    .process,
+    .claim .section,
+    #install {
+      padding-top: 24px;
+      padding-bottom: 24px;
+    }
+    .section-label { margin-bottom: 14px; }
+    .section-title {
+      font-size: clamp(2.5rem, min(4.7vw, 7.5svh), 4.5rem);
+    }
+    .body-copy {
+      font-size: 0.96rem;
+      line-height: 1.55;
+    }
+    .body-copy p { margin-bottom: 14px; }
+    .intro-copy .body-copy { margin-top: 20px; }
+    .evidence-head,
+    .evidence-caption {
+      min-height: 38px;
+      padding-block: 7px;
+    }
+
+    .process-heading { padding-bottom: 18px; }
+    .process-step {
+      min-height: 190px;
+      padding-top: 40px;
+      padding-bottom: 18px;
+    }
+    .process-step h3 {
+      min-height: 2.2em;
+      margin: 18px 0 10px;
+      font-size: clamp(1.35rem, 1.8vw, 1.8rem);
+    }
+    .process-step p {
+      font-size: 0.82rem;
+      line-height: 1.45;
+    }
+
+    .claim-copy h2 {
+      font-size: clamp(2.5rem, min(3.7vw, 6.6svh), 4.3rem);
+    }
+    .claim-copy .body-copy { margin-top: 18px; }
+    .claim-note {
+      margin-top: 16px;
+      padding-top: 14px;
+      font-size: 0.78rem;
+    }
+    .verdict-item {
+      padding-block: 11px;
+    }
+    .verdict-number { font-size: clamp(1.9rem, 2.6vw, 2.8rem); }
+    .verdict-item h3 {
+      padding-bottom: 9px;
+      font-size: clamp(1rem, 1.45vw, 1.25rem);
+    }
+    .verdict-item p {
+      margin-top: 9px;
+      font-size: 0.86rem;
+      line-height: 1.45;
+    }
+
+    .install-header {
+      margin-bottom: 14px;
+    }
+    .install-row {
+      min-height: 68px;
+      padding-block: 7px;
+    }
+    .install-name h3 { font-size: 1.24rem; }
+    .install-name p { font-size: 0.78rem; }
+    .code-block {
+      padding: 8px 14px;
+      font-size: 0.72rem;
+      line-height: 1.4;
+    }
   }
 
   @media (max-width: 1100px) {
