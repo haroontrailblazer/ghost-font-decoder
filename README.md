@@ -275,13 +275,7 @@ evidence, and answer with the recovered message.
 
 ## Star History
 
-<a href="https://www.star-history.com/?repos=haroontrailblazer%2Fghost-font-decoder&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=haroontrailblazer/ghost-font-decoder&type=date&theme=dark&legend=top-left&sealed_token=bNdvW6bVmT2oSv-C1N0prFPbfEKNgYeOFKj1NdvRKnainHfHE_qpkPkFSr7eAvojunoqOQlXNa52p8O3ZzqxPe3mgIzTaTDjyinI892ra1B6hpfvMdM220J8TdnoVCJLK8rXAYIx1NYHLkCcW7KXz3NgqGkQAXZdc8TCHHy8UEmKcrpKHtPFw482aGT9" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=haroontrailblazer/ghost-font-decoder&type=date&legend=top-left&sealed_token=bNdvW6bVmT2oSv-C1N0prFPbfEKNgYeOFKj1NdvRKnainHfHE_qpkPkFSr7eAvojunoqOQlXNa52p8O3ZzqxPe3mgIzTaTDjyinI892ra1B6hpfvMdM220J8TdnoVCJLK8rXAYIx1NYHLkCcW7KXz3NgqGkQAXZdc8TCHHy8UEmKcrpKHtPFw482aGT9" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=haroontrailblazer/ghost-font-decoder&type=date&legend=top-left&sealed_token=bNdvW6bVmT2oSv-C1N0prFPbfEKNgYeOFKj1NdvRKnainHfHE_qpkPkFSr7eAvojunoqOQlXNa52p8O3ZzqxPe3mgIzTaTDjyinI892ra1B6hpfvMdM220J8TdnoVCJLK8rXAYIx1NYHLkCcW7KXz3NgqGkQAXZdc8TCHHy8UEmKcrpKHtPFw482aGT9" />
- </picture>
-</a>
+[![Star History Chart](https://api.star-history.com/chart?repos=haroontrailblazer/ghost-font-decoder&type=date&legend=top-left&sealed_token=AIssu1oO_eYM0zXHea6eJ7rK_JFIrTUW6y8ouq31ZlapWmg1M4vSgOcR1w3MHDkJPGrx83SK0E4cgmKbNDUzD5iETjs6yZqQzx23TH6_D0-BNZ3c7JUhy-MfLjd50R64RU4iNufmIRmUFhoN82t58esMDekfOcj1n4L_ojbvGFL17Jvm0RaMxGmeN9j4)](https://www.star-history.com/?repos=haroontrailblazer%2Fghost-font-decoder&type=date&legend=top-left)
 
 
 
