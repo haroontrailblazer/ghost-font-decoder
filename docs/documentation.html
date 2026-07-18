@@ -15,6 +15,7 @@
 <meta property="og:description" content="How motion-hidden text is reconstructed with classic computer vision.">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://fontdecoder.vercel.app/documentation.html">
+<link rel="stylesheet" href="code-viewer.css">
 <meta property="og:image" content="https://fontdecoder.vercel.app/assets/og-image-v4.jpg">
 <style>
   :root {
@@ -937,7 +938,7 @@
               <path d="M5 12h14M13 6l6 6-6 6"/>
             </svg>
           </a>
-          <a class="button button-secondary" href="https://github.com/haroontrailblazer/ghost-font-decoder/blob/main/decode.py">
+          <a class="button button-secondary" href="https://github.com/haroontrailblazer/ghost-font-decoder/blob/main/decode.py" data-code-viewer="https://raw.githubusercontent.com/haroontrailblazer/ghost-font-decoder/main/decode.py">
             Read decode.py
             <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
               <path d="M7 17 17 7M8 7h9v9"/>
@@ -1548,8 +1549,9 @@ python decode.py examples/ghost-message.mp4</pre>
       <div class="footer-group">
         <h2>Project</h2>
         <a href="index.html">Project home</a>
-        <a href="https://github.com/haroontrailblazer/ghost-font-decoder">Source</a>
-        <a href="https://github.com/haroontrailblazer/ghost-font-decoder/blob/main/LICENSE">MIT License</a>
+        <a href="https://github.com/haroontrailblazer/ghost-font-decoder" data-repo-viewer="https://api.github.com/repos/haroontrailblazer/ghost-font-decoder/git/trees/main?recursive=1" data-readme-viewer="https://raw.githubusercontent.com/haroontrailblazer/ghost-font-decoder/main/README.md">Source</a>
+        <a href="https://github.com/haroontrailblazer/ghost-font-decoder/blob/main/decode.py" data-code-viewer="https://raw.githubusercontent.com/haroontrailblazer/ghost-font-decoder/main/decode.py">Python CLI</a>
+        <a href="https://github.com/haroontrailblazer/ghost-font-decoder/blob/main/LICENSE" data-text-viewer="https://raw.githubusercontent.com/haroontrailblazer/ghost-font-decoder/main/LICENSE" data-viewer-title="LICENSE">MIT License</a>
       </div>
       <div class="footer-group">
         <h2>Author</h2>
@@ -1566,6 +1568,7 @@ python decode.py examples/ghost-message.mp4</pre>
   </div>
 </footer>
 
+<script src="code-viewer.js"></script>
 <script>
 (() => {
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
