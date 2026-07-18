@@ -1,4 +1,4 @@
 interface:
   display_name: "Ghost Font Decoder"
-  short_description: "Reveal motion-hidden text in noisy videos"
-  default_prompt: "Use $ghost-decode to recover and report the hidden text in this ghost-font video."
+  short_description: "Decode video text and show the reveal image"
+  default_prompt: "Use $ghost-decode to run the decoder, show the revealed image, and state exactly what text is in this video."

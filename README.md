@@ -69,8 +69,9 @@ Add this repository as a local plugin source in a Codex marketplace, install
 
 > Use $ghost-decode to tell me what ghost-video.mp4 says.
 
-Codex runs the bundled decoder, checks the revealed mask, and reports the hidden
-text.
+Codex runs the bundled decoder, checks the revealed mask, renders
+`revealed.png` directly in chat, and responds with
+`Text in the video: <recovered text>`.
 
 ## Use with Claude Code
 

@@ -1,7 +1,7 @@
 {
   "name": "ghost-font-decoder",
-  "version": "1.1.0",
-  "description": "Reveal text hidden in ghost-font videos and motion-defined random-dot clips using optical flow and OCR.",
+  "version": "1.1.1",
+  "description": "Run a decoder for ghost-font videos, show the revealed output image, and state the motion-hidden text in chat.",
   "author": {
     "name": "baskaran",
     "email": "baskaran@closefuture.io",
@@ -22,8 +22,8 @@
   "skills": "./codex-skills/",
   "interface": {
     "displayName": "Ghost Font Decoder",
-    "shortDescription": "Reveal motion-hidden text in noisy videos",
-    "longDescription": "Decode text that is invisible in paused frames but appears through counter-moving dots or noise. The plugin uses dense optical flow, drift compensation, image cleanup, and optional OCR.",
+    "shortDescription": "Decode the text and show its reveal image",
+    "longDescription": "Run the Python decoder on text that is invisible in paused frames but appears through counter-moving dots or noise. The plugin uses dense optical flow, drift compensation, image cleanup, and optional OCR, then renders the revealed image and states the exact recovered text in chat.",
     "developerName": "baskaran",
     "category": "Developer Tools",
     "capabilities": [
@@ -33,8 +33,8 @@
     ],
     "websiteURL": "https://github.com/haroontrailblazer/ghost-font-decoder",
     "defaultPrompt": [
-      "Decode the hidden message in this ghost-font video.",
-      "Check this noisy video for motion-defined text."
+      "Run the decoder, show the revealed image, and state the exact text in this video.",
+      "Decode this noisy video and display both the output image and recovered text."
     ],
     "brandColor": "#171717",
     "screenshots": []
