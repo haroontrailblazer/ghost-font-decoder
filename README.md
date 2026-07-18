@@ -273,7 +273,6 @@ This project packages a proven computer-vision technique as an agent skill, so
 the same assistant that receives the video can run the analysis, inspect the
 evidence, and answer with the recovered message.
 
-## Star history
 
 ## Star History
 
