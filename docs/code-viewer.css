@@ -344,6 +344,10 @@ details[open] > summary .repo-tree-chevron {
   background: #080908;
 }
 
+.repo-file--standalone {
+  height: 100%;
+}
+
 .repo-file-heading {
   padding: 0 18px;
   text-transform: none;

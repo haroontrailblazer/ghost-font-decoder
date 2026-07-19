@@ -365,18 +365,42 @@
     return cache.get(url);
   }
 
-  function renderText(text, options) {
+  function renderText(text, options, mode = options.defaultMode || "source") {
     activeText = text;
     const lines = text.replace(/\r\n/g, "\n").split("\n");
+    const canPreview = options.language === "markdown";
     title.textContent = options.title;
     meta.textContent = `${options.label} · ${lines.length} lines`;
-    body.innerHTML = `
-      <div class="code-viewer-scroll">
-        <code class="code-viewer-code" aria-label="${options.ariaLabel}">
-          ${sourceRows(text, options.language)}
-        </code>
-      </div>
-    `;
+    const fileBody = canPreview && mode === "preview"
+      ? `<article class="markdown-preview">${markdownPreview(text, options.rawBase, options.repoBase)}</article>`
+      : `
+        <div class="code-viewer-scroll">
+          <code class="code-viewer-code" aria-label="${options.ariaLabel}">
+            ${sourceRows(text, options.language)}
+          </code>
+        </div>
+      `;
+
+    body.innerHTML = canPreview ? `
+      <section class="repo-file repo-file--standalone" aria-label="${escapeAttribute(options.title)}">
+        <div class="repo-file-heading">
+          <div class="repo-file-path" title="${escapeAttribute(options.title)}">
+            <strong>${escapeHtml(options.title)}</strong>
+          </div>
+          <div class="repo-view-toggle" aria-label="Markdown display mode">
+            <button type="button" data-viewer-mode="preview" class="${mode === "preview" ? "is-active" : ""}">Preview</button>
+            <button type="button" data-viewer-mode="source" class="${mode === "source" ? "is-active" : ""}">Source</button>
+          </div>
+        </div>
+        <div class="repo-file-content">${fileBody}</div>
+      </section>
+    ` : fileBody;
+
+    body.querySelectorAll("[data-viewer-mode]").forEach((button) => {
+      button.addEventListener("click", () => {
+        renderText(text, options, button.dataset.viewerMode);
+      });
+    });
     copyButton.disabled = false;
   }
 
@@ -646,6 +670,13 @@
     const language = trigger.dataset.viewerLanguage || (isPython ? "python" : "text");
     const label = trigger.dataset.viewerLabel || (isPython ? "Python source" : "Plain text");
     const ariaLabel = trigger.dataset.viewerAriaLabel || `${filename} source`;
+    const rawMarker = "/main/";
+    const rawBase = url.includes(rawMarker)
+      ? url.slice(0, url.indexOf(rawMarker) + rawMarker.length)
+      : url.slice(0, url.lastIndexOf("/") + 1);
+    const repoBase = trigger.href.includes("/blob/")
+      ? trigger.href.slice(0, trigger.href.indexOf("/blob/"))
+      : trigger.href.replace(/\/$/, "");
     title.textContent = filename;
     meta.textContent = label;
     setLoading(`Loading ${escapeHtml(filename)}&hellip;`);
@@ -657,7 +688,10 @@
         title: filename,
         label,
         language,
-        ariaLabel
+        ariaLabel,
+        rawBase,
+        repoBase,
+        defaultMode: trigger.dataset.viewerDefaultMode || "source"
       });
     } catch {
       if (requestId !== requestSequence) return;
