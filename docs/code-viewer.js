@@ -444,6 +444,10 @@
     return repositoryState.rawBase + path.split("/").map(encodeURIComponent).join("/");
   }
 
+  function repositoryDisplayName() {
+    return repositoryState?.displayName || "ghost-font-decoder";
+  }
+
   function repositoryGithubUrl(path) {
     return `${repositoryState.repoBase}/blob/main/${path.split("/").map(encodeURIComponent).join("/")}`;
   }
@@ -484,7 +488,7 @@
     panel.innerHTML = `
       <div class="repo-file-heading">
         <div class="repo-file-path" title="${escapeAttribute(path)}">
-          <span>ghost-font-decoder</span><span>/</span><strong>${escapeHtml(path)}</strong>
+          <span>${escapeHtml(repositoryDisplayName())}</span><span>/</span><strong>${escapeHtml(path)}</strong>
         </div>
         ${isMarkdown ? `
           <div class="repo-view-toggle" aria-label="Markdown display mode">
@@ -513,7 +517,7 @@
     githubLink.href = repositoryGithubUrl(path);
     panel.innerHTML = `
       <div class="repo-file-heading">
-        <div class="repo-file-path"><span>ghost-font-decoder</span><span>/</span><strong>${escapeHtml(path)}</strong></div>
+        <div class="repo-file-path"><span>${escapeHtml(repositoryDisplayName())}</span><span>/</span><strong>${escapeHtml(path)}</strong></div>
       </div>
       <div class="repo-file-loading" role="status">Loading ${escapeHtml(filename)}&hellip;</div>
     `;
@@ -524,7 +528,7 @@
       const url = repositoryRawUrl(path);
       panel.innerHTML = `
         <div class="repo-file-heading">
-          <div class="repo-file-path"><span>ghost-font-decoder</span><span>/</span><strong>${escapeHtml(path)}</strong></div>
+          <div class="repo-file-path"><span>${escapeHtml(repositoryDisplayName())}</span><span>/</span><strong>${escapeHtml(path)}</strong></div>
           <span class="repo-file-lines">${kind} preview</span>
         </div>
         <div class="repo-media-preview">
@@ -541,7 +545,7 @@
       copyButton.disabled = true;
       panel.innerHTML = `
         <div class="repo-file-heading">
-          <div class="repo-file-path"><span>ghost-font-decoder</span><span>/</span><strong>${escapeHtml(path)}</strong></div>
+          <div class="repo-file-path"><span>${escapeHtml(repositoryDisplayName())}</span><span>/</span><strong>${escapeHtml(path)}</strong></div>
         </div>
         <div class="repo-file-empty">This binary file cannot be previewed here. Use the GitHub button to open it.</div>
       `;
@@ -559,28 +563,38 @@
   }
 
   async function openRepository(trigger, requestId) {
-    title.textContent = "ghost-font-decoder";
+    const viewerTitle = trigger.dataset.viewerTitle || "ghost-font-decoder";
+    const initialFile = trigger.dataset.repoInitialFile || "README.md";
+    const initialFileUrl = trigger.dataset.repoInitialFileViewer || trigger.dataset.readmeViewer;
+    title.textContent = viewerTitle;
     meta.textContent = "Repository source";
-    setLoading("Loading repository tree and README&hellip;");
+    setLoading("Loading repository files&hellip;");
 
-    const [treeResult, readmeResult] = await Promise.allSettled([
+    const [treeResult, initialFileResult] = await Promise.allSettled([
       fetchJson(trigger.dataset.repoViewer),
-      fetchText(trigger.dataset.readmeViewer)
+      fetchText(initialFileUrl)
     ]);
     if (requestId !== requestSequence) return;
 
-    if (treeResult.status === "rejected" && readmeResult.status === "rejected") {
+    if (treeResult.status === "rejected" && initialFileResult.status === "rejected") {
       setError("The repository could not be loaded. Use the GitHub button to open the source.");
       return;
     }
 
     const tree = treeResult.status === "fulfilled" ? treeResult.value.tree || [] : [];
-    const visibleTree = tree.filter(
-      (item) => item.path !== "docs" && !item.path.startsWith("docs/")
-    );
-    const readme = readmeResult.status === "fulfilled"
-      ? readmeResult.value
-      : "# README unavailable\n\nUse the GitHub button to view the repository README.";
+    const roots = (trigger.dataset.repoRoots || "")
+      .split(",")
+      .map((root) => root.trim().replace(/\/$/, ""))
+      .filter(Boolean);
+    const visibleTree = tree.filter((item) => {
+      if (roots.length) {
+        return roots.some((root) => item.path === root || item.path.startsWith(`${root}/`));
+      }
+      return item.path !== "docs" && !item.path.startsWith("docs/");
+    });
+    const initialText = initialFileResult.status === "fulfilled"
+      ? initialFileResult.value
+      : `# ${initialFile} unavailable\n\nUse the GitHub button to view this file.`;
     const fileCount = visibleTree.filter((item) => item.type === "blob").length;
     const folderCount = visibleTree.filter((item) => item.type === "tree").length;
     const rawBase = trigger.dataset.readmeViewer.slice(0, trigger.dataset.readmeViewer.lastIndexOf("/") + 1);
@@ -588,6 +602,7 @@
       tree: visibleTree,
       rawBase,
       repoBase: trigger.href.replace(/\/$/, ""),
+      displayName: viewerTitle,
       selectionSequence: 0,
       currentPath: "",
       currentText: "",
@@ -611,7 +626,7 @@
     body.querySelectorAll("[data-repo-file]").forEach((button) => {
       button.addEventListener("click", () => openRepositoryFile(button.dataset.repoFile));
     });
-    await openRepositoryFile("README.md", readme);
+    await openRepositoryFile(initialFile, initialText);
   }
 
   async function openTrigger(trigger) {
@@ -627,9 +642,12 @@
 
     const isPython = Boolean(trigger.dataset.codeViewer);
     const url = trigger.dataset.codeViewer || trigger.dataset.textViewer;
-    const filename = trigger.dataset.viewerTitle || (isPython ? "decode.py" : "LICENSE");
+    const filename = trigger.dataset.viewerTitle || url.split("/").pop() || (isPython ? "decode.py" : "File");
+    const language = trigger.dataset.viewerLanguage || (isPython ? "python" : "text");
+    const label = trigger.dataset.viewerLabel || (isPython ? "Python source" : "Plain text");
+    const ariaLabel = trigger.dataset.viewerAriaLabel || `${filename} source`;
     title.textContent = filename;
-    meta.textContent = isPython ? "Python source" : "Plain text";
+    meta.textContent = label;
     setLoading(`Loading ${escapeHtml(filename)}&hellip;`);
 
     try {
@@ -637,9 +655,9 @@
       if (requestId !== requestSequence) return;
       renderText(text, {
         title: filename,
-        label: isPython ? "Python" : "Plain text",
-        language: isPython ? "python" : "text",
-        ariaLabel: isPython ? "Python source code" : "License text"
+        label,
+        language,
+        ariaLabel
       });
     } catch {
       if (requestId !== requestSequence) return;
