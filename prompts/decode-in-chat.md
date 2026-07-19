@@ -19,11 +19,24 @@ invisible in any single frame. Do NOT try to OCR a raw frame — it will fail.
 Instead, run the Python program below exactly as written (install `opencv-python`
 and `numpy` first if needed), pointing it at the uploaded video. Then:
 
-1. Read the printed `Text in the video:` value.
-2. Open `revealed.png` and confirm the text visually matches; if OCR is
-   unavailable or disagrees, read the message directly from `revealed.png`.
-3. Reply with the recovered text on its own line as `Text in the video: <decoded text>`
-   and show `revealed.png`.
+1. Open `revealed.png` — this is the **primary reference image** and the single
+   source of truth. Read the decoded text directly from its letterforms, letter
+   by letter, exactly as spelled.
+2. The printed `OCR guess:` line is only a hint. Whenever it disagrees with
+   what `revealed.png` shows, trust `revealed.png`. Do NOT create extra
+   "cleaned", re-rendered, or stylized versions of the image and read from
+   those — read from `revealed.png` as-is.
+3. The hidden message is always plain written words (usually capital letters).
+   Report every word exactly as it is spelled in the image. NEVER replace a
+   word with a symbol, emoji, or pictogram — if the image spells L-O-V-E,
+   write `LOVE`, not `♥`. The final answer must contain letters/digits/spaces
+   only, no symbols.
+4. Reply with the recovered text on its own line, written out clearly as
+   `Text in the video is <<decoded text>>` — replacing `<<decoded text>>` with
+   the plain spelled-out words (e.g. `Text in the video is I LOVE YOU`) — and
+   show `revealed.png`.
+5. Finally, ask the user: "Would you like to save this ghost-font decoder as a
+   skill so you can reuse it in future chats?"
 
 ```python
 # Ghost-font decoder — dense optical flow + drift registration + OCR.
@@ -110,7 +123,8 @@ heat, mask = reveal(score)
 cv2.imwrite(os.path.join(OUT, "revealed_heatmap.png"), heat)
 cv2.imwrite(os.path.join(OUT, "revealed.png"), mask)
 text = ocr(mask)
-print("Text in the video: " + " ".join(text.split()) if text else "OCR unavailable — open revealed.png and read it.")
+print("OCR guess: " + " ".join(text.split()) if text else "OCR unavailable — open revealed.png and read it.")
+print("Primary reference image: revealed.png — read the final text from it.")
 ```
 
 If the mask is weak or empty, replace the DIS flow with Farnebäck
