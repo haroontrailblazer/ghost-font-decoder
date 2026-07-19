@@ -273,10 +273,6 @@ This project packages a proven computer-vision technique as an agent skill, so
 the same assistant that receives the video can run the analysis, inspect the
 evidence, and answer with the recovered message.
 
-## Star History
-
-[![Star History Chart](https://api.star-history.com/chart?repos=haroontrailblazer/ghost-font-decoder&type=date&legend=top-left&sealed_token=AIssu1oO_eYM0zXHea6eJ7rK_JFIrTUW6y8ouq31ZlapWmg1M4vSgOcR1w3MHDkJPGrx83SK0E4cgmKbNDUzD5iETjs6yZqQzx23TH6_D0-BNZ3c7JUhy-MfLjd50R64RU4iNufmIRmUFhoN82t58esMDekfOcj1n4L_ojbvGFL17Jvm0RaMxGmeN9j4)](https://www.star-history.com/?repos=haroontrailblazer%2Fghost-font-decoder&type=date&legend=top-left)
-
 
 
 ## License
