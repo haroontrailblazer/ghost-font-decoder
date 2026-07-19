@@ -715,7 +715,15 @@
   copyButton.addEventListener("click", async () => {
     if (!activeText) return;
     try {
-      await navigator.clipboard.writeText(activeText);
+      let copyText = activeText;
+      const heading = activeTrigger?.dataset.viewerCopyAfterHeading;
+      if (heading) {
+        const lines = copyText.replace(/\r\n/g, "\n").split("\n");
+        const headingIndex = lines.findIndex((line) => line.trim() === heading);
+        if (headingIndex === -1) throw new Error("Copy boundary not found");
+        copyText = lines.slice(headingIndex + 1).join("\n").trim();
+      }
+      await navigator.clipboard.writeText(copyText);
       copyButton.textContent = "Copied";
     } catch {
       copyButton.textContent = "Copy failed";

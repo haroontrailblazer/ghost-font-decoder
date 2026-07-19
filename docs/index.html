@@ -690,6 +690,17 @@
     scrollbar-color: var(--signal) #181b18;
   }
   .code-accent { color: var(--signal); }
+  .code-file-link {
+    text-decoration: underline;
+    text-decoration-color: rgb(200 255 0 / 0.45);
+    text-underline-offset: 3px;
+  }
+  .code-file-link:hover,
+  .code-file-link:focus-visible {
+    color: #e5ff80;
+    text-decoration-color: currentColor;
+    outline: none;
+  }
   .copy-button {
     display: inline-flex;
     align-items: center;
@@ -1351,9 +1362,21 @@ python decode.py examples/ghost-message.mp4</pre>
             <h3>Any chat — no install</h3>
             <p>Paste the decoder prompt and attach a video.</p>
           </div>
-          <pre class="code-block" id="code-chat">Open prompts/decode-in-chat.md
+          <pre class="code-block" id="code-chat">Open <a class="code-accent code-file-link"
+             href="https://github.com/haroontrailblazer/ghost-font-decoder/blob/main/prompts/decode-in-chat.md"
+             data-text-viewer="https://raw.githubusercontent.com/haroontrailblazer/ghost-font-decoder/main/prompts/decode-in-chat.md"
+             data-viewer-title="prompts/decode-in-chat.md"
+             data-viewer-language="markdown"
+             data-viewer-label="Markdown prompt"
+             data-viewer-default-mode="preview"
+             data-viewer-copy-after-heading="## Prompt to paste"
+             data-viewer-aria-label="Decoder chat prompt source">prompts/decode-in-chat.md</a>
 Paste it into Claude, ChatGPT, or Codex.</pre>
-          <button class="copy-button" type="button" data-copy="code-chat" aria-label="Copy chat instructions">
+          <button class="copy-button" type="button"
+                  data-copy="code-chat"
+                  data-copy-url="https://raw.githubusercontent.com/haroontrailblazer/ghost-font-decoder/main/prompts/decode-in-chat.md"
+                  data-copy-after-heading="## Prompt to paste"
+                  aria-label="Copy reusable chat prompt">
             <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
               <rect x="8" y="8" width="11" height="12"/><path d="M16 8V4H5v12h3"/>
             </svg>
@@ -1403,6 +1426,7 @@ Paste it into Claude, ChatGPT, or Codex.</pre>
            data-viewer-language="markdown"
            data-viewer-label="Markdown prompt"
            data-viewer-default-mode="preview"
+           data-viewer-copy-after-heading="## Prompt to paste"
            data-viewer-aria-label="Decoder chat prompt source">Chat prompt</a>
       </div>
       <div class="footer-group">
@@ -1488,16 +1512,38 @@ Paste it into Claude, ChatGPT, or Codex.</pre>
       if (!target || !label) return;
 
       try {
-        await navigator.clipboard.writeText(target.innerText.trim());
+        let copyText = target.innerText.trim();
+        if (button.dataset.copyUrl) {
+          const response = await fetch(button.dataset.copyUrl);
+          if (!response.ok) throw new Error(`Prompt request failed (${response.status})`);
+          copyText = (await response.text()).replace(/\r\n/g, "\n");
+
+          const heading = button.dataset.copyAfterHeading;
+          if (heading) {
+            const lines = copyText.split("\n");
+            const headingIndex = lines.findIndex((line) => line.trim() === heading);
+            if (headingIndex === -1) throw new Error("Prompt heading not found");
+            copyText = lines.slice(headingIndex + 1).join("\n").trim();
+          }
+        }
+
+        try {
+          await navigator.clipboard.writeText(copyText);
+        } catch {
+          const textarea = document.createElement("textarea");
+          textarea.value = copyText;
+          textarea.setAttribute("readonly", "");
+          textarea.style.position = "fixed";
+          textarea.style.opacity = "0";
+          document.body.append(textarea);
+          textarea.select();
+          const copied = typeof document.execCommand === "function" && document.execCommand("copy");
+          textarea.remove();
+          if (!copied) throw new Error("Clipboard unavailable");
+        }
         label.textContent = "Copied";
       } catch {
-        const range = document.createRange();
-        range.selectNodeContents(target);
-        const selection = window.getSelection();
-        selection.removeAllRanges();
-        selection.addRange(range);
-        const copied = typeof document.execCommand === "function" && document.execCommand("copy");
-        label.textContent = copied ? "Copied" : "Selected";
+        label.textContent = "Copy failed";
       }
 
       window.setTimeout(() => { label.textContent = "Copy"; }, 1800);
