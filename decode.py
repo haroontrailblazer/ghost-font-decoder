@@ -153,7 +153,12 @@ def reveal_mask(score):
     n, labels, stats, _ = cv2.connectedComponentsWithStats(mask)
     min_area = mask.size // 20000
     for i in range(1, n):
-        if stats[i, cv2.CC_STAT_AREA] < min_area:
+        _, _, w, h, area = stats[i]
+        # Drop drift-registration streaks: wide, short horizontal bands (aspect
+        # >= 5, only a few percent of frame height). Real glyphs, even wide ones
+        # like M/W, stay near square, so this never touches a letter.
+        streak = w >= 5 * h and h <= height // 18
+        if area < min_area or streak:
             mask[labels == i] = 0
     return norm, mask
 
