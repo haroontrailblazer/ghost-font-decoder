@@ -85,7 +85,7 @@ setup.
 ### Plain Python
 
 ```bash
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 python decode.py examples/ghost-message.mp4
 ```
 
@@ -224,7 +224,7 @@ This repository ships native skill packaging for each supported agent:
 | --- | --- |
 | Claude Code | `.claude-plugin/plugin.json`, marketplace metadata, and `claude-skills/ghost-decode/SKILL.md` |
 | Claude.ai | Uploadable skill built from `claude-ai-skill/ghost-decode/SKILL.md` |
-| Codex | `.codex-plugin/plugin.json`, `codex-skills/ghost-decode/SKILL.md`, and `agents/openai.yaml` |
+| Codex | Discoverable `skills/ghost-decode/` plus a `codex-skills/ghost-decode/` compatibility copy |
 | Any supported chat | Portable workflow in `prompts/decode-in-chat.md` |
 | Standalone | `decode.py` and `requirements.txt` |
 
@@ -238,7 +238,7 @@ This repository ships native skill packaging for each supported agent:
 Install Python dependencies:
 
 ```bash
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
 
 On Windows, Tesseract can be installed with:
@@ -257,7 +257,8 @@ ghost-font-decoder/
 ├── examples/                     # Reproducible sample video and outputs
 ├── claude-skills/                # Claude Code skill
 ├── claude-ai-skill/              # Claude.ai uploadable skill source
-├── codex-skills/                 # Codex skill and UI metadata
+├── skills/                       # Codex skill and UI metadata
+├── codex-skills/                 # Codex compatibility copy
 ├── commands/                     # Claude Code slash command
 ├── prompts/                      # Portable in-chat workflow
 └── docs/                         # Project page and proof assets
