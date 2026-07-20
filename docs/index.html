@@ -458,25 +458,33 @@
     outline-offset: -4px;
   }
   .media-lightbox {
-    width: min(94vw, 1500px);
+    width: min(96vw, 1500px);
+    height: 94vh;
     max-width: none;
-    padding: 0;
-    overflow: visible;
+    max-height: none;
+    padding: 18px;
+    overflow: hidden;
     border: 1px solid #555a53;
     background: #080908;
     color: var(--paper);
   }
+  .media-lightbox[open] {
+    display: grid;
+    place-items: center;
+  }
   .media-lightbox::backdrop { background: rgb(0 0 0 / 0.88); }
   .media-lightbox img {
-    width: 100%;
-    max-height: 88vh;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: calc(94vh - 36px);
     display: block;
     object-fit: contain;
   }
   .lightbox-close {
     position: absolute;
-    top: -18px;
-    right: -18px;
+    top: 12px;
+    right: 12px;
     width: 42px;
     height: 42px;
     display: grid;
@@ -640,6 +648,141 @@
     line-height: 1.65;
   }
 
+  .real-proof {
+    overflow: hidden;
+    overflow-anchor: none;
+    border-bottom: 1px solid var(--ink);
+  }
+  .proof-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(390px, 0.72fr);
+    align-items: end;
+    gap: clamp(48px, 8vw, 132px);
+    margin-bottom: clamp(34px, 5vw, 60px);
+  }
+  .proof-header-copy .section-title { max-width: 760px; }
+  .proof-intro {
+    max-width: 560px;
+    justify-self: end;
+  }
+  .proof-intro .body-copy { margin-bottom: 24px; }
+  .proof-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border: 1px solid var(--ink);
+  }
+  .proof-tab {
+    min-height: 54px;
+    padding: 10px 16px;
+    border: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .proof-tab + .proof-tab { border-left: 1px solid var(--ink); }
+  .proof-tab[aria-selected="true"] {
+    background: var(--ink);
+    color: var(--signal);
+  }
+  .proof-tab:hover:not([aria-selected="true"]) { background: #f0f2ed; }
+  .proof-tab:focus-visible {
+    position: relative;
+    z-index: 1;
+    outline: 3px solid var(--signal);
+    outline-offset: 3px;
+  }
+  .proof-stage {
+    border-top: 2px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+  }
+  .proof-panel {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .proof-panel[hidden] { display: none; }
+  .proof-card { min-width: 0; }
+  .proof-card + .proof-card { border-left: 1px solid var(--ink); }
+  .proof-card-head,
+  .proof-card-caption {
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 11px 16px;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+  }
+  .proof-card-head {
+    border-bottom: 1px solid var(--ink);
+    letter-spacing: 0.055em;
+    text-transform: uppercase;
+  }
+  .proof-outcome {
+    color: var(--signal-deep);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .proof-card-caption {
+    justify-content: flex-start;
+    border-top: 1px solid var(--ink);
+    color: var(--muted);
+    line-height: 1.45;
+  }
+  .proof-media {
+    height: clamp(235px, 28svh, 330px);
+    overflow: hidden;
+    background: #090a09;
+  }
+  .proof-image-button {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: block;
+    padding: 0;
+    border: 0;
+    background: #090a09;
+    cursor: zoom-in;
+  }
+  .proof-image-button img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    object-position: center var(--proof-focus, 55%);
+    transform: scale(1.015);
+    transition: filter 180ms ease, transform 240ms ease;
+  }
+  .proof-image-button::after {
+    content: "Open full chat ↗";
+    position: absolute;
+    right: 14px;
+    bottom: 14px;
+    padding: 9px 12px;
+    border: 1px solid var(--signal);
+    background: rgb(9 10 9 / 0.9);
+    color: var(--signal);
+    font-family: var(--mono);
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.055em;
+    text-transform: uppercase;
+    pointer-events: none;
+  }
+  .proof-image-button:hover img {
+    filter: brightness(1.08);
+    transform: scale(1.035);
+  }
+  .proof-image-button:focus-visible {
+    outline: 4px solid var(--signal);
+    outline-offset: -4px;
+  }
+
   .install-header {
     display: grid;
     grid-template-columns: 1.2fr 0.8fr;
@@ -777,6 +920,7 @@
     #what > .intro-grid,
     .process,
     .claim .section,
+    .real-proof,
     #install {
       min-height: calc(100svh - 82px);
     }
@@ -838,6 +982,12 @@
       margin-top: clamp(10px, 2svh, 16px);
     }
 
+    .real-proof {
+      display: grid;
+      align-content: start;
+      padding-block: clamp(28px, 4svh, 48px);
+    }
+
     #install {
       display: grid;
       align-content: center;
@@ -889,6 +1039,7 @@
     #what > .intro-grid,
     .process,
     .claim .section,
+    .real-proof,
     #install {
       padding-top: 24px;
       padding-bottom: 24px;
@@ -948,6 +1099,20 @@
       line-height: 1.45;
     }
 
+    .proof-header {
+      margin-bottom: 20px;
+    }
+    .proof-intro .body-copy {
+      margin-bottom: 14px;
+    }
+    .proof-tab { min-height: 44px; }
+    .proof-media { height: max(230px, 34svh); }
+    .proof-card-head,
+    .proof-card-caption {
+      min-height: 40px;
+      padding-block: 7px;
+    }
+
     .install-header {
       margin-bottom: 14px;
     }
@@ -979,6 +1144,11 @@
     .claim-grid { grid-template-columns: 1fr; }
     .claim-copy { max-width: 760px; }
     .claim-copy h2 { max-width: 720px; }
+    .proof-header { grid-template-columns: 1fr; }
+    .proof-intro {
+      justify-self: start;
+      max-width: 700px;
+    }
     .install-header { grid-template-columns: 1fr; }
     .install-header .body-copy { justify-self: start; }
     .install-row { grid-template-columns: 50px minmax(170px, 0.45fr) minmax(320px, 1.25fr) 76px; gap: 18px; }
@@ -1030,6 +1200,25 @@
     .claim-grid { gap: 56px; }
     .claim-copy h2 { font-size: clamp(3rem, 13vw, 4.8rem); }
     .verdict-item { grid-template-columns: 58px 1fr; gap: 12px; }
+    .proof-header { gap: 32px; }
+    .proof-tabs { width: 100%; }
+    .proof-panel { grid-template-columns: 1fr; }
+    .proof-card + .proof-card {
+      border-left: 0;
+      border-top: 1px solid var(--ink);
+    }
+    .proof-media { height: min(620px, 112vw); }
+    .proof-image-button img {
+      object-fit: contain;
+      object-position: center;
+      transform: none;
+    }
+    .proof-image-button:hover img { transform: none; }
+    .proof-image-button::after {
+      right: 10px;
+      bottom: 10px;
+      padding: 8px 10px;
+    }
     .install-row {
       grid-template-columns: 34px minmax(0, 1fr) auto;
       grid-template-areas:
@@ -1073,7 +1262,15 @@
     .decoder-bar,
     .decoder-output-label,
     .evidence-head,
-    .evidence-caption { font-size: 0.63rem; }
+    .evidence-caption,
+    .proof-tab,
+    .proof-card-head,
+    .proof-card-caption { font-size: 0.63rem; }
+    .proof-card-head {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 2px;
+    }
     .verdict-item { grid-template-columns: 1fr; }
     .install-row { grid-template-columns: 30px minmax(0, 1fr) auto; gap: 12px; }
     .install-name { padding-left: 14px; }
@@ -1105,6 +1302,7 @@
       <a href="#what">What it is</a>
       <a href="#how">How it breaks</a>
       <a href="#claim">The claim</a>
+      <a href="#proof">Chat proof</a>
       <a class="nav-github" href="https://github.com/haroontrailblazer/ghost-font-decoder">
         <span>GitHub</span>
         <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -1194,7 +1392,10 @@
           <div class="evidence-item evidence-item--agent">
             <div class="evidence-head">Agent result · decoded in Codex</div>
             <div class="evidence-media">
-              <button class="evidence-image-button" type="button" aria-label="Open the Codex decoding result in a large view" aria-haspopup="dialog">
+              <button class="evidence-image-button" type="button" aria-label="Open the Codex decoding result in a large view" aria-haspopup="dialog"
+                      data-lightbox-src="assets/agent-decoded-result.png"
+                      data-lightbox-alt="Large Codex chat screenshot showing the recovered video text: I LOVE YOU"
+                      data-lightbox-label="Large view of the Codex decoding result">
                 <img src="assets/agent-decoded-result.png" alt="Codex chat showing the agent decoded the ghost-font video and reported I LOVE YOU">
               </button>
             </div>
@@ -1296,6 +1497,126 @@
     </div>
   </section>
 
+  <section class="section real-proof" id="proof" aria-labelledby="proof-title">
+    <div class="shell">
+      <div class="proof-header reveal">
+        <div class="proof-header-copy">
+          <p class="section-label">Chat proof</p>
+          <h2 class="section-title" id="proof-title">The same message. Two ways in.</h2>
+          <div class="short-rule" aria-hidden="true"></div>
+        </div>
+        <div class="proof-intro">
+          <div class="body-copy">
+            <p>
+              Four unedited chat captures show Codex and Claude recovering
+              <strong>I LOVE YOU</strong> from the same ghost-font video.
+            </p>
+          </div>
+          <div class="proof-tabs" role="tablist" aria-label="Choose proof method">
+            <button class="proof-tab" id="proof-tab-prompt" type="button" role="tab"
+                    aria-selected="true" aria-controls="proof-panel-prompt"
+                    data-proof-tab="prompt">Prompt · no install</button>
+            <button class="proof-tab" id="proof-tab-plugin" type="button" role="tab"
+                    aria-selected="false" aria-controls="proof-panel-plugin"
+                    tabindex="-1" data-proof-tab="plugin">Plugin / skill</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="proof-stage reveal">
+        <div class="proof-panel" id="proof-panel-prompt" role="tabpanel"
+             aria-labelledby="proof-tab-prompt" data-proof-panel="prompt">
+          <article class="proof-card">
+            <div class="proof-card-head">
+              <span>Codex · reusable prompt</span>
+              <span class="proof-outcome">Decoded: I LOVE YOU</span>
+            </div>
+            <div class="proof-media">
+              <button class="proof-image-button" type="button"
+                      style="--proof-focus: 66%;"
+                      aria-label="Open the full Codex prompt proof screenshot"
+                      aria-haspopup="dialog"
+                      data-lightbox-src="assets/proof/codex-prompt-proof.png"
+                      data-lightbox-alt="Codex chat using the reusable decoder prompt and revealing the hidden message I LOVE YOU"
+                      data-lightbox-label="Codex prompt proof">
+                <img src="assets/proof/codex-prompt-proof.png"
+                     alt="Codex chat using the reusable prompt and decoding I LOVE YOU"
+                     loading="lazy" width="1078" height="1917">
+              </button>
+            </div>
+            <p class="proof-card-caption">The decoder prompt is pasted directly into a regular Codex chat.</p>
+          </article>
+
+          <article class="proof-card">
+            <div class="proof-card-head">
+              <span>Claude · reusable prompt</span>
+              <span class="proof-outcome">Decoded: I LOVE YOU</span>
+            </div>
+            <div class="proof-media">
+              <button class="proof-image-button" type="button"
+                      style="--proof-focus: 61%;"
+                      aria-label="Open the full Claude prompt proof screenshot"
+                      aria-haspopup="dialog"
+                      data-lightbox-src="assets/proof/claude-prompt-proof.png"
+                      data-lightbox-alt="Claude chat using the reusable decoder prompt and revealing the hidden message I LOVE YOU"
+                      data-lightbox-label="Claude prompt proof">
+                <img src="assets/proof/claude-prompt-proof.png"
+                     alt="Claude chat using the reusable prompt and decoding I LOVE YOU"
+                     loading="lazy" width="1078" height="1846">
+              </button>
+            </div>
+            <p class="proof-card-caption">The same standalone prompt runs in Claude and returns the matching result.</p>
+          </article>
+        </div>
+
+        <div class="proof-panel" id="proof-panel-plugin" role="tabpanel"
+             aria-labelledby="proof-tab-plugin" data-proof-panel="plugin" hidden>
+          <article class="proof-card">
+            <div class="proof-card-head">
+              <span>Codex · installed plugin</span>
+              <span class="proof-outcome">Decoded: I LOVE YOU</span>
+            </div>
+            <div class="proof-media">
+              <button class="proof-image-button" type="button"
+                      style="--proof-focus: 68%;"
+                      aria-label="Open the full Codex plugin proof screenshot"
+                      aria-haspopup="dialog"
+                      data-lightbox-src="assets/proof/codex-plugin-proof.png"
+                      data-lightbox-alt="Codex chat using the Ghost Font Decoder plugin and revealing the hidden message I LOVE YOU"
+                      data-lightbox-label="Codex plugin proof">
+                <img src="assets/proof/codex-plugin-proof.png"
+                     alt="Codex chat using the Ghost Font Decoder plugin and decoding I LOVE YOU"
+                     loading="lazy" width="1078" height="1917">
+              </button>
+            </div>
+            <p class="proof-card-caption">The installed Ghost Font Decoder plugin handles the full decode workflow.</p>
+          </article>
+
+          <article class="proof-card">
+            <div class="proof-card-head">
+              <span>Claude · installed skill</span>
+              <span class="proof-outcome">Decoded: I LOVE YOU</span>
+            </div>
+            <div class="proof-media">
+              <button class="proof-image-button" type="button"
+                      style="--proof-focus: 50%;"
+                      aria-label="Open the full Claude skill proof screenshot"
+                      aria-haspopup="dialog"
+                      data-lightbox-src="assets/proof/claude-plugin-proof.png"
+                      data-lightbox-alt="Claude chat using the installed ghost-decode skill and revealing the hidden message I LOVE YOU"
+                      data-lightbox-label="Claude skill proof">
+                <img src="assets/proof/claude-plugin-proof.png"
+                     alt="Claude chat using the installed ghost-decode skill and decoding I LOVE YOU"
+                     loading="lazy" width="1078" height="1825">
+              </button>
+            </div>
+            <p class="proof-card-caption">The installed <code>/ghost-decode</code> skill returns the same message in Claude.</p>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="section" id="install">
     <div class="shell">
       <div class="install-header reveal">
@@ -1389,7 +1710,7 @@ Paste it into Claude or Codex.</pre>
   </section>
 </main>
 
-<dialog class="media-lightbox" id="agent-result-lightbox" aria-label="Large view of the Codex decoding result">
+<dialog class="media-lightbox" id="agent-result-lightbox" aria-label="Large proof image">
   <button class="lightbox-close" type="button" aria-label="Close large image">×</button>
   <img src="assets/agent-decoded-result.png" alt="Large Codex chat screenshot showing the recovered video text: I LOVE YOU">
 </dialog>
@@ -1402,6 +1723,7 @@ Paste it into Claude or Codex.</pre>
         <a href="#what">What it is</a>
         <a href="#how">How it breaks</a>
         <a href="#claim">The security claim</a>
+        <a href="#proof">Chat proof</a>
         <a href="#install">Install</a>
       </div>
       <div class="footer-group">
@@ -1457,8 +1779,10 @@ Paste it into Claude or Codex.</pre>
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const scramble = document.getElementById("scramble");
   const resultLightbox = document.getElementById("agent-result-lightbox");
-  const resultImageButton = document.querySelector(".evidence-image-button");
+  const resultLightboxImage = resultLightbox?.querySelector("img");
   const lightboxClose = resultLightbox?.querySelector(".lightbox-close");
+  const proofTabs = Array.from(document.querySelectorAll("[data-proof-tab]"));
+  const proofPanels = Array.from(document.querySelectorAll("[data-proof-panel]"));
   const phrases = [
     "HELLO HUMAN",
     "THE TEXT THEY SAID AI CAN'T READ",
@@ -1470,10 +1794,56 @@ Paste it into Claude or Codex.</pre>
   const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   const randomGlyph = () => glyphs[Math.floor(Math.random() * glyphs.length)];
 
-  resultImageButton?.addEventListener("click", () => resultLightbox?.showModal());
+  document.querySelectorAll("[data-lightbox-src]").forEach((button) => {
+    button.addEventListener("click", () => {
+      if (!resultLightbox || !resultLightboxImage) return;
+      resultLightboxImage.src = button.dataset.lightboxSrc;
+      resultLightboxImage.alt = button.dataset.lightboxAlt || "";
+      resultLightbox.setAttribute("aria-label", button.dataset.lightboxLabel || "Large proof image");
+      resultLightbox.showModal();
+    });
+  });
   lightboxClose?.addEventListener("click", () => resultLightbox?.close());
   resultLightbox?.addEventListener("click", (event) => {
     if (event.target === resultLightbox) resultLightbox.close();
+  });
+
+  const selectProofTab = (selectedTab) => {
+    const selectedPanel = selectedTab.dataset.proofTab;
+    proofTabs.forEach((tab) => {
+      const isSelected = tab === selectedTab;
+      tab.setAttribute("aria-selected", String(isSelected));
+      tab.tabIndex = isSelected ? 0 : -1;
+    });
+    proofPanels.forEach((panel) => {
+      panel.hidden = panel.dataset.proofPanel !== selectedPanel;
+    });
+
+    const proofSection = document.getElementById("proof");
+    const siteNav = document.querySelector(".site-nav");
+    if (proofSection && location.hash === "#proof") {
+      const navHeight = siteNav?.offsetHeight || 0;
+      if (proofSection.getBoundingClientRect().top >= navHeight - 2) {
+        requestAnimationFrame(() => {
+          window.scrollTo({
+            top: Math.max(0, proofSection.offsetTop - navHeight),
+            behavior: "instant"
+          });
+        });
+      }
+    }
+  };
+
+  proofTabs.forEach((tab, index) => {
+    tab.addEventListener("click", () => selectProofTab(tab));
+    tab.addEventListener("keydown", (event) => {
+      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+      event.preventDefault();
+      const direction = event.key === "ArrowRight" ? 1 : -1;
+      const nextTab = proofTabs[(index + direction + proofTabs.length) % proofTabs.length];
+      selectProofTab(nextTab);
+      nextTab.focus();
+    });
   });
 
   async function scrambleTo(text) {
