@@ -36,7 +36,7 @@ revealed images, and replies with `Text in the video: <decoded text>`.
 
 - `ghost-decode/SKILL.md` — self-contained: the instructions **and** the decoder
   (dense optical flow → background subtraction → drift registration → accumulate
-  → cropped clean mask + full-frame heatmap). Claude writes
+  → clean mask + colormapped heatmap, cropped tightly to the text). Claude writes
   the decoder to a file, runs it once, and reads the word from the two images. No
   separate files needed.
 

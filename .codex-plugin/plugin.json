@@ -1,6 +1,6 @@
 {
   "name": "ghost-font-decoder",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "Run a decoder for ghost-font videos, show the revealed output image, and state the motion-hidden text in chat.",
   "author": {
     "name": "Haroon K M",
@@ -19,7 +19,7 @@
     "kinematogram",
     "steganography"
   ],
-  "skills": "./skills/",
+  "skills": "./codex-skills/",
   "interface": {
     "displayName": "Ghost Font Decoder",
     "shortDescription": "Decode the text and show its reveal image",

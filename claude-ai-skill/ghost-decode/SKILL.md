@@ -12,7 +12,7 @@ A ghost-font video hides a message in motion: every frame is noise, but the dots
 1. Write the program in **Decoder** (below) to `decode.py`, then run it once on the video:
 
    ```bash
-   python -m pip install --quiet opencv-python-headless numpy
+   pip install --quiet opencv-python-headless numpy
    python decode.py "<video-path>" out
    ```
 
@@ -61,8 +61,9 @@ def frames(path):
     cap.release()
 
 def frame_to_text(mask, heat, pad_frac=0.08):
-    # Crop and enlarge only the clean mask. Keep the heatmap full-frame so a faint
-    # leading, trailing, or separate glyph cannot be cropped away.
+    # Crop both images tightly to the text and enlarge, so a small glyph (a lone
+    # `I`, an accent, a short top line) is big and obvious instead of a few pixels
+    # lost in a mostly-empty frame. The mask defines the box; the heatmap matches.
     ys, xs = np.where(mask > 127)
     if ys.size == 0:
         return mask, heat
@@ -71,12 +72,13 @@ def frame_to_text(mask, heat, pad_frac=0.08):
     pad = int(pad_frac * max(x1 - x0, y1 - y0)) + 8
     y0, y1 = max(0, y0 - pad), min(hh, y1 + pad + 1)
     x0, x1 = max(0, x0 - pad), min(ww, x1 + pad + 1)
-    mask = mask[y0:y1, x0:x1]
+    mask, heat = mask[y0:y1, x0:x1], heat[y0:y1, x0:x1]
     long_side = max(mask.shape[:2])
     if long_side < 1000:
         f = min(4.0, 1000.0 / long_side)
         size = (int(mask.shape[1] * f), int(mask.shape[0] * f))
         mask = cv2.resize(mask, size, interpolation=cv2.INTER_NEAREST)
+        heat = cv2.resize(heat, size, interpolation=cv2.INTER_CUBIC)
     return mask, heat
 
 dis = cv2.DISOpticalFlow_create(cv2.DISOPTICAL_FLOW_PRESET_MEDIUM)
@@ -120,7 +122,7 @@ for i in range(1, n):
     at_edge = x <= 2 or x + w >= w_img - 2            # drift bands hug an edge
     if area < mask.size // 20000 or (band and (at_edge or w >= w_img // 3)):
         mask[lab == i] = 0
-# crop/enlarge the clean mask; preserve the full-frame heatmap
+# crop both images tightly to the text (a lone I stays visible), then save
 mask, norm = frame_to_text(mask, norm)
 cv2.imwrite(os.path.join(OUT, "revealed_heatmap.png"), cv2.applyColorMap(norm, cv2.COLORMAP_INFERNO))
 cv2.imwrite(os.path.join(OUT, "revealed.png"), mask)
