@@ -1,4 +1,0 @@
-interface:
-  display_name: "Ghost Font Decoder"
-  short_description: "Decode video text and show the reveal image"
-  default_prompt: "Use $ghost-decode to run the decoder, show both revealed images, and state exactly what text is in this video."
