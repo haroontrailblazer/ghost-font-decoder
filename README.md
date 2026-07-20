@@ -115,8 +115,8 @@ Claude Code ran the decoder across 185 frame pairs, compensated for drift, and
 identified the full three-line message.
 
 <p align="center">
-  <a href="docs/assets/proof/claude-code-decoded.png">
-    <img src="docs/assets/proof/claude-code-decoded.png" alt="Claude Code successfully decoding the hidden text I LOVE YOU" width="720">
+  <a href="docs/assets/proof/claude-code-decoded.webp">
+    <img src="docs/assets/proof/claude-code-decoded.webp" alt="Claude Code successfully decoding the hidden text I LOVE YOU" width="720">
   </a>
 </p>
 
@@ -126,8 +126,8 @@ The uploaded `ghost-decode` skill accepted the video and returned the hidden
 message directly in the conversation.
 
 <p align="center">
-  <a href="docs/assets/proof/claude-ai-decoded.png">
-    <img src="docs/assets/proof/claude-ai-decoded.png" alt="Claude.ai ghost font skill reporting I LOVE YOU" width="720">
+  <a href="docs/assets/proof/claude-ai-decoded.webp">
+    <img src="docs/assets/proof/claude-ai-decoded.webp" alt="Claude.ai ghost font skill reporting I LOVE YOU" width="720">
   </a>
 </p>
 
@@ -137,8 +137,8 @@ Claude.ai returned both outputs used to verify the answer: the cleaned reveal
 and the raw motion heatmap.
 
 <p align="center">
-  <a href="docs/assets/proof/claude-ai-outputs.png">
-    <img src="docs/assets/proof/claude-ai-outputs.png" alt="Claude.ai providing the revealed image and heatmap files" width="720">
+  <a href="docs/assets/proof/claude-ai-outputs.webp">
+    <img src="docs/assets/proof/claude-ai-outputs.webp" alt="Claude.ai providing the revealed image and heatmap files" width="720">
   </a>
 </p>
 
@@ -148,8 +148,8 @@ Opening the generated reveal makes the hidden **I LOVE YOU** message directly
 visible.
 
 <p align="center">
-  <a href="docs/assets/proof/claude-ai-reveal.png">
-    <img src="docs/assets/proof/claude-ai-reveal.png" alt="Clean mask revealing the words I LOVE YOU in Claude.ai" width="720">
+  <a href="docs/assets/proof/claude-ai-reveal.webp">
+    <img src="docs/assets/proof/claude-ai-reveal.webp" alt="Clean mask revealing the words I LOVE YOU in Claude.ai" width="720">
   </a>
 </p>
 
@@ -159,8 +159,8 @@ Codex invoked the installed skill, reported the decoded text, rendered the
 reveal, and linked both generated outputs.
 
 <p align="center">
-  <a href="docs/assets/proof/codex-decoded.png">
-    <img src="docs/assets/proof/codex-decoded.png" alt="Codex successfully decoding and displaying the hidden text I LOVE YOU" width="720">
+  <a href="docs/assets/proof/codex-decoded.webp">
+    <img src="docs/assets/proof/codex-decoded.webp" alt="Codex successfully decoding and displaying the hidden text I LOVE YOU" width="720">
   </a>
 </p>
 

@@ -10,13 +10,13 @@
 <meta name="robots" content="index, follow, max-image-preview:large">
 <link rel="canonical" href="https://fontdecoder.vercel.app/docs">
 <link rel="icon" href="assets/favicon.ico" sizes="any">
-<link rel="apple-touch-icon" href="assets/brand-icon.png">
+<link rel="apple-touch-icon" href="assets/brand-icon.webp">
 <meta property="og:title" content="Ghost Font Decoder — Technical Documentation">
 <meta property="og:description" content="How motion-hidden text is reconstructed with classic computer vision.">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://fontdecoder.vercel.app/docs">
 <link rel="stylesheet" href="code-viewer.css">
-<meta property="og:image" content="https://fontdecoder.vercel.app/assets/og-image-v4.jpg">
+<meta property="og:image" content="https://fontdecoder.vercel.app/assets/og-image-v4.webp">
 <style>
   :root {
     --paper: #ffffff;
@@ -899,7 +899,7 @@
 <header class="site-nav">
   <div class="shell nav-inner">
     <a class="brand" href="index.html" aria-label="Ghost Font Decoder home">
-      <img class="brand-mark" src="assets/brand-icon.png" alt="" width="40" height="40">
+      <img class="brand-mark" src="assets/brand-icon.webp" alt="" width="40" height="40">
       <span>Ghost Font Decoder</span>
     </a>
     <nav class="nav-links" aria-label="Documentation navigation">
@@ -955,13 +955,13 @@
         <div class="signal-proof-grid">
           <div class="signal-proof-panel">
             <div class="signal-proof-media">
-              <img src="assets/paused-frame.png" alt="A paused ghost-font video frame that appears to contain only random dots">
+              <img src="assets/paused-frame.webp" alt="A paused ghost-font video frame that appears to contain only random dots">
             </div>
             <figcaption class="signal-proof-caption">One frame: statistically uniform dots. No readable glyph boundary.</figcaption>
           </div>
           <div class="signal-proof-panel">
             <div class="signal-proof-media">
-              <img src="assets/proof/recovered-binary-mask.png" alt="Binary recovered mask showing I LOVE YOU">
+              <img src="assets/proof/recovered-binary-mask.webp" alt="Binary recovered mask showing I LOVE YOU">
             </div>
             <figcaption class="signal-proof-caption">Many frame pairs: registered counter-motion accumulates into letters.</figcaption>
           </div>
@@ -1292,7 +1292,7 @@ sₜ(x) = max(0, rₜ(x) · (−bₜ / ‖bₜ‖))</code>
         <div class="output-grid">
           <article class="output-card">
             <div class="output-media">
-              <img src="assets/revealed.png" alt="Clean binary mask revealing HELLO HUMAN" loading="lazy">
+              <img src="assets/revealed.webp" alt="Clean binary mask revealing HELLO HUMAN" loading="lazy">
             </div>
             <div class="output-copy">
               <span>revealed.png</span>
@@ -1305,7 +1305,7 @@ sₜ(x) = max(0, rₜ(x) · (−bₜ / ‖bₜ‖))</code>
           </article>
           <article class="output-card">
             <div class="output-media">
-              <img src="assets/revealed_heatmap.png" alt="Raw accumulated opposition heatmap revealing HELLO HUMAN" loading="lazy">
+              <img src="assets/revealed_heatmap.webp" alt="Raw accumulated opposition heatmap revealing HELLO HUMAN" loading="lazy">
             </div>
             <div class="output-copy">
               <span>revealed_heatmap.png</span>
@@ -1459,8 +1459,8 @@ python decode.py docs/assets/ghost-message.mp4</pre>
 
         <div class="proof-gallery">
           <figure class="proof-card">
-            <button class="proof-button" type="button" data-image="assets/proof/claude-code-decoded.png" aria-label="Open Claude Code proof at full resolution">
-              <img src="assets/proof/claude-code-decoded.png" alt="Claude Code reporting I LOVE YOU after processing 185 frame pairs" loading="lazy">
+            <button class="proof-button" type="button" data-image="assets/proof/claude-code-decoded.webp" aria-label="Open Claude Code proof at full resolution">
+              <img src="assets/proof/claude-code-decoded.webp" alt="Claude Code reporting I LOVE YOU after processing 185 frame pairs" loading="lazy">
             </button>
             <figcaption>
               <strong>Claude Code</strong>
@@ -1469,8 +1469,8 @@ python decode.py docs/assets/ghost-message.mp4</pre>
           </figure>
 
           <figure class="proof-card">
-            <button class="proof-button" type="button" data-image="assets/proof/codex-decoded.png" aria-label="Open Codex proof at full resolution">
-              <img src="assets/proof/codex-decoded.png" alt="Codex task showing the recovered I LOVE YOU message and output links" loading="lazy">
+            <button class="proof-button" type="button" data-image="assets/proof/codex-decoded.webp" aria-label="Open Codex proof at full resolution">
+              <img src="assets/proof/codex-decoded.webp" alt="Codex task showing the recovered I LOVE YOU message and output links" loading="lazy">
             </button>
             <figcaption>
               <strong>Codex</strong>
@@ -1479,8 +1479,8 @@ python decode.py docs/assets/ghost-message.mp4</pre>
           </figure>
 
           <figure class="proof-card">
-            <button class="proof-button" type="button" data-image="assets/proof/claude-ai-decoded.png" aria-label="Open Claude.ai decode proof at full resolution">
-              <img src="assets/proof/claude-ai-decoded.png" alt="Claude.ai reporting the decoded hidden message I LOVE YOU" loading="lazy">
+            <button class="proof-button" type="button" data-image="assets/proof/claude-ai-decoded.webp" aria-label="Open Claude.ai decode proof at full resolution">
+              <img src="assets/proof/claude-ai-decoded.webp" alt="Claude.ai reporting the decoded hidden message I LOVE YOU" loading="lazy">
             </button>
             <figcaption>
               <strong>Claude.ai</strong>
@@ -1489,8 +1489,8 @@ python decode.py docs/assets/ghost-message.mp4</pre>
           </figure>
 
           <figure class="proof-card">
-            <button class="proof-button" type="button" data-image="assets/proof/claude-ai-reveal.png" aria-label="Open recovered mask proof at full resolution">
-              <img src="assets/proof/claude-ai-reveal.png" alt="Claude.ai displaying the clean mask revealing I LOVE YOU" loading="lazy">
+            <button class="proof-button" type="button" data-image="assets/proof/claude-ai-reveal.webp" aria-label="Open recovered mask proof at full resolution">
+              <img src="assets/proof/claude-ai-reveal.webp" alt="Claude.ai displaying the clean mask revealing I LOVE YOU" loading="lazy">
             </button>
             <figcaption>
               <strong>Recovered mask</strong>
@@ -1527,7 +1527,7 @@ python decode.py docs/assets/ghost-message.mp4</pre>
 
 <dialog class="media-lightbox" id="proof-lightbox" aria-label="Full-resolution proof image">
   <button class="lightbox-close" type="button" aria-label="Close full-resolution image">×</button>
-  <img src="assets/proof/codex-decoded.png" alt="">
+  <img src="assets/proof/codex-decoded.webp" alt="">
 </dialog>
 
 <footer class="site-footer">
