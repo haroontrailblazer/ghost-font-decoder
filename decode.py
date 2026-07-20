@@ -153,12 +153,14 @@ def reveal_mask(score):
     n, labels, stats, _ = cv2.connectedComponentsWithStats(mask)
     min_area = mask.size // 20000
     for i in range(1, n):
-        _, _, w, h, area = stats[i]
-        # Drop drift-registration streaks: wide, short horizontal bands (aspect
-        # >= 5, only a few percent of frame height). Real glyphs, even wide ones
-        # like M/W, stay near square, so this never touches a letter.
-        streak = w >= 5 * h and h <= height // 18
-        if area < min_area or streak:
+        x, _, w, h, area = stats[i]
+        # Drop drift-registration streaks: wide, short horizontal bands that hug
+        # a frame edge or span a huge width. Real glyphs never do both — even a
+        # dash or underscore mid-word sits away from the edges and isn't that
+        # wide — so letters and punctuation are untouched.
+        band = w >= 5 * h and h <= height // 18
+        at_edge = x <= 2 or x + w >= width - 2
+        if area < min_area or (band and (at_edge or w >= width // 3)):
             mask[labels == i] = 0
     return norm, mask
 

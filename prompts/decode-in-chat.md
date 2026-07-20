@@ -126,9 +126,13 @@ def reveal(score):
     k = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
     mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, k)
     mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, k)
+    h_img, w_img = mask.shape
     n, lab, st, _ = cv2.connectedComponentsWithStats(mask)
     for i in range(1, n):
-        if st[i, cv2.CC_STAT_AREA] < mask.size // 20000:
+        x, y, w, h, area = st[i]
+        band = w >= 5 * h and h <= h_img // 18            # wide, short
+        at_edge = x <= 2 or x + w >= w_img - 2            # drift bands hug an edge
+        if area < mask.size // 20000 or (band and (at_edge or w >= w_img // 3)):
             mask[lab == i] = 0
     return norm, mask
 
