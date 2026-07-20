@@ -1,6 +1,6 @@
 {
   "name": "ghost-font-decoder",
-  "version": "1.3.2",
+  "version": "1.4.0",
   "description": "Run a decoder for ghost-font videos, show the revealed output image, and state the motion-hidden text in chat.",
   "author": {
     "name": "Haroon K M",

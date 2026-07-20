@@ -16,7 +16,7 @@ python claude-ai-skill/build-zip.py
 ```
 
 This writes `claude-ai-skill/ghost-decode.zip` containing only
-`ghost-decode/SKILL.md` and `ghost-decode/decode.py`.
+`ghost-decode/SKILL.md` (the decoder is embedded in it).
 
 ## Install in claude.ai (2 minutes)
 
@@ -29,23 +29,25 @@ This writes `claude-ai-skill/ghost-decode.zip` containing only
 
    > What does this video say?
 
-Claude loads the `ghost-decode` skill, runs the bundled decoder, views the
-revealed image, and replies with `Text in the video: <decoded text>`.
+Claude loads the `ghost-decode` skill, runs the bundled decoder, views the two
+revealed images, and replies with `Text in the video: <decoded text>`.
 
 ## What's inside
 
 - `ghost-decode/SKILL.md` — self-contained: the instructions **and** the decoder
   (dense optical flow → background subtraction → drift registration → accumulate
-  → colormapped heatmap). Claude writes the decoder to a file, runs it once, and
-  reads the word from the heatmap. No separate files needed.
+  → clean mask + colormapped heatmap, cropped tightly to the text). Claude writes
+  the decoder to a file, runs it once, and reads the word from the two images. No
+  separate files needed.
 
 ## Notes
 
 - The sandbox installs `opencv-python-headless` and `numpy` automatically.
-- The skill is deliberately minimal: run once, read the revealed heatmap, report
-  `Text in the video: <text>`. It explicitly tells Claude **not** to crop,
-  enhance, re-decode, or explain — the accumulated heatmap already shows the
-  letters as soft glowing shapes.
+- The skill is deliberately minimal: run once, produce exactly two images
+  (`revealed.png` + `revealed_heatmap.png`), read the word, report
+  `Text in the video: <text>`. It explicitly tells Claude **not** to re-decode,
+  try other methods, or explain — the decoder already crops the output to the
+  text so every glyph (even a small `I`) is clearly visible.
 - Same decoder ships as a `/ghost-decode` command + skill for **Claude Code** and
   a `$ghost-decode` skill for **Codex**. See the repository root README.
 

@@ -1,7 +1,7 @@
 {
   "name": "ghost-font-decoder",
   "displayName": "Ghost Font Decoder",
-  "version": "1.3.2",
+  "version": "1.4.0",
   "skills": "./claude-skills/",
   "commands": "./commands/",
   "description": "Reveal text hidden in ghost-font videos (motion-defined dot text) using optical flow and OCR",

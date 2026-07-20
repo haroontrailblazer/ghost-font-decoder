@@ -236,6 +236,35 @@ def run_ocr(mask):
     return text or None
 
 
+def frame_to_text(mask, heat, pad_frac=0.08):
+    """Crop both output images tightly to the recovered text and enlarge them.
+
+    A ghost message usually fills a small part of a 720p-plus frame, so a small
+    glyph — a lone `I`, an accent, a short top line — is only a few pixels in the
+    saved image and easy to overlook. Cropping to the text's bounding box (plus a
+    margin) and upscaling makes every glyph large without changing the layout.
+    The mask defines the box; the heatmap is cropped to match. Returns the
+    originals unchanged when the mask is empty.
+    """
+    ys, xs = np.where(mask > 127)
+    if ys.size == 0:
+        return mask, heat
+    y0, y1 = int(ys.min()), int(ys.max())
+    x0, x1 = int(xs.min()), int(xs.max())
+    height, width = mask.shape
+    pad = int(pad_frac * max(x1 - x0, y1 - y0)) + 8
+    y0, y1 = max(0, y0 - pad), min(height, y1 + pad + 1)
+    x0, x1 = max(0, x0 - pad), min(width, x1 + pad + 1)
+    mask, heat = mask[y0:y1, x0:x1], heat[y0:y1, x0:x1]
+    long_side = max(mask.shape[:2])
+    if long_side < 1000:
+        f = min(4.0, 1000.0 / long_side)
+        size = (int(mask.shape[1] * f), int(mask.shape[0] * f))
+        mask = cv2.resize(mask, size, interpolation=cv2.INTER_NEAREST)
+        heat = cv2.resize(heat, size, interpolation=cv2.INTER_CUBIC)
+    return mask, heat
+
+
 def main():
     ap = argparse.ArgumentParser(description="Decode ghost-font (motion-defined text) videos via optical flow")
     ap.add_argument("video", help="path to the ghost-font video")
@@ -254,12 +283,13 @@ def main():
 
     heat_path = os.path.join(args.out_dir, "revealed_heatmap.png")
     mask_path = os.path.join(args.out_dir, "revealed.png")
-    cv2.imwrite(heat_path, heat)
-    cv2.imwrite(mask_path, mask)
+    disp_mask, disp_heat = frame_to_text(mask, heat)  # crop/enlarge for viewing
+    cv2.imwrite(heat_path, disp_heat)
+    cv2.imwrite(mask_path, disp_mask)
     print(f"Wrote {heat_path} (raw opposition score) and {mask_path} (clean mask)")
 
     if not args.no_ocr:
-        text = run_ocr(mask)
+        text = run_ocr(mask)  # OCR runs on the full-frame mask
         if text:
             single_line = " ".join(text.split())  # collapse OCR line breaks
             print("\nText in the video: " + single_line)

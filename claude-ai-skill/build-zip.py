@@ -4,8 +4,8 @@
 Run from anywhere:  python claude-ai-skill/build-zip.py
 
 Produces claude-ai-skill/ghost-decode.zip containing only the skill folder
-(ghost-decode/SKILL.md + ghost-decode/decode.py) with forward-slash paths, so
-it uploads cleanly to claude.ai. The zip is intentionally NOT committed to the
+(ghost-decode/SKILL.md — the decoder is embedded in it) with forward-slash paths,
+so it uploads cleanly to claude.ai. The zip is intentionally NOT committed to the
 repo: a zip inside the repo becomes a nested zip inside the plugin package
 (marketplace source "./"), which claude.ai refuses to install.
 """

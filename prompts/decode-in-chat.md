@@ -148,11 +148,33 @@ def ocr(mask):
     t = pytesseract.image_to_string(cv2.bitwise_not(mask), config="--psm 6").strip()
     return t or None
 
+def frame_to_text(mask, heat, pad_frac=0.08):
+    # Crop both images to the text and enlarge, so a small glyph (a lone `I`, an
+    # accent, a short top line) is big and obvious instead of a few pixels lost in
+    # a mostly-empty frame. The mask defines the box; the heatmap is cropped to match.
+    ys, xs = np.where(mask > 127)
+    if ys.size == 0:
+        return mask, heat
+    y0, y1, x0, x1 = int(ys.min()), int(ys.max()), int(xs.min()), int(xs.max())
+    hh, ww = mask.shape
+    pad = int(pad_frac * max(x1 - x0, y1 - y0)) + 8
+    y0, y1 = max(0, y0 - pad), min(hh, y1 + pad + 1)
+    x0, x1 = max(0, x0 - pad), min(ww, x1 + pad + 1)
+    mask, heat = mask[y0:y1, x0:x1], heat[y0:y1, x0:x1]
+    long_side = max(mask.shape[:2])
+    if long_side < 1000:
+        f = min(4.0, 1000.0 / long_side)
+        size = (int(mask.shape[1] * f), int(mask.shape[0] * f))
+        mask = cv2.resize(mask, size, interpolation=cv2.INTER_NEAREST)
+        heat = cv2.resize(heat, size, interpolation=cv2.INTER_CUBIC)
+    return mask, heat
+
 score = accumulate(iter_gray(VIDEO))
 heat, mask = reveal(score)
+text = ocr(mask)                             # OCR on the full-frame mask
+mask, heat = frame_to_text(mask, heat)       # crop + enlarge so a lone `I` stays visible
 cv2.imwrite(os.path.join(OUT, "revealed_heatmap.png"), heat)
 cv2.imwrite(os.path.join(OUT, "revealed.png"), mask)
-text = ocr(mask)
 print("OCR guess: " + " ".join(text.split()) if text else "OCR unavailable — open revealed.png and read it.")
 print("Wrote revealed.png (clean mask, black background / white text — easiest to read) and revealed_heatmap.png (raw score — sanity check).")
 print("Read from revealed.png, cross-check against the OCR guess and the blob count, then display BOTH images in the reply.")
