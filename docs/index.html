@@ -458,26 +458,34 @@
     outline-offset: -4px;
   }
   .media-lightbox {
-    width: min(96vw, 1500px);
-    height: 94vh;
-    max-width: none;
-    max-height: none;
-    padding: 18px;
-    overflow: hidden;
-    border: 1px solid #555a53;
-    background: #080908;
+    box-sizing: border-box;
+    width: fit-content;
+    height: fit-content;
+    max-width: calc(100vw - 16px);
+    max-height: calc(100dvh - 16px);
+    padding: 0;
+    overflow: visible;
+    border: 0;
+    background: transparent;
     color: var(--paper);
   }
   .media-lightbox[open] {
-    display: grid;
-    place-items: center;
+    display: block;
   }
   .media-lightbox::backdrop { background: rgb(0 0 0 / 0.88); }
+  .lightbox-frame {
+    position: relative;
+    width: fit-content;
+    height: fit-content;
+    padding: 0.5cm;
+    background: #080908;
+  }
   .media-lightbox img {
     width: auto;
     height: auto;
-    max-width: 100%;
-    max-height: calc(94vh - 36px);
+    max-width: calc(100vw - 1cm - 18px);
+    max-height: calc(100dvh - 1cm - 18px);
+    margin: 0;
     display: block;
     object-fit: contain;
   }
@@ -1177,7 +1185,7 @@
     .section-title { font-size: clamp(3.1rem, 16vw, 5rem); }
     .evidence-grid { grid-template-columns: 1fr; }
     .evidence-item + .evidence-item { border-left: 0; border-top: 1px solid var(--ink); }
-    .media-lightbox { width: calc(100vw - 28px); }
+    .media-lightbox { width: fit-content; }
     .lightbox-close { top: 8px; right: 8px; }
     .process-rail { grid-template-columns: 1fr; }
     .process-step {
@@ -1711,8 +1719,10 @@ Paste it into Claude or Codex.</pre>
 </main>
 
 <dialog class="media-lightbox" id="agent-result-lightbox" aria-label="Large proof image">
+  <div class="lightbox-frame">
   <button class="lightbox-close" type="button" aria-label="Close large image">×</button>
-  <img src="assets/agent-decoded-result.webp" alt="Large Codex chat screenshot showing the recovered video text: I LOVE YOU">
+    <img src="assets/agent-decoded-result.webp" alt="Large Codex chat screenshot showing the recovered video text: I LOVE YOU">
+  </div>
 </dialog>
 
 <footer class="site-footer">
@@ -1795,11 +1805,16 @@ Paste it into Claude or Codex.</pre>
   const randomGlyph = () => glyphs[Math.floor(Math.random() * glyphs.length)];
 
   document.querySelectorAll("[data-lightbox-src]").forEach((button) => {
-    button.addEventListener("click", () => {
+    button.addEventListener("click", async () => {
       if (!resultLightbox || !resultLightboxImage) return;
       resultLightboxImage.src = button.dataset.lightboxSrc;
       resultLightboxImage.alt = button.dataset.lightboxAlt || "";
       resultLightbox.setAttribute("aria-label", button.dataset.lightboxLabel || "Large proof image");
+      try {
+        await resultLightboxImage.decode();
+      } catch {
+        // The dialog can still display the browser's loaded image fallback.
+      }
       resultLightbox.showModal();
     });
   });

@@ -687,18 +687,34 @@
   }
 
   .media-lightbox {
-    width: min(94vw, 1540px);
-    max-width: none;
+    box-sizing: border-box;
+    width: fit-content;
+    height: fit-content;
+    max-width: calc(100vw - 16px);
+    max-height: calc(100dvh - 16px);
     padding: 0;
     overflow: visible;
-    border: 1px solid #555a53;
-    background: #080908;
+    border: 0;
+    background: transparent;
     color: var(--paper);
   }
+  .media-lightbox[open] {
+    display: block;
+  }
   .media-lightbox::backdrop { background: rgb(0 0 0 / 0.88); }
+  .lightbox-frame {
+    position: relative;
+    width: fit-content;
+    height: fit-content;
+    padding: 0.5cm;
+    background: #080908;
+  }
   .media-lightbox img {
-    width: 100%;
-    max-height: 88vh;
+    width: auto;
+    height: auto;
+    max-width: calc(100vw - 1cm - 18px);
+    max-height: calc(100dvh - 1cm - 18px);
+    margin: 0;
     display: block;
     object-fit: contain;
   }
@@ -862,7 +878,7 @@
     .parameter-table th,
     .parameter-table td { min-width: 150px; }
     .parameter-table td:first-child { min-width: 190px; }
-    .media-lightbox { width: calc(100vw - 28px); }
+    .media-lightbox { width: fit-content; }
     .lightbox-close { top: 8px; right: 8px; }
     .footer-grid { grid-template-columns: 1fr 1fr; }
     .footer-wordmark {
@@ -1526,8 +1542,10 @@ python decode.py docs/assets/ghost-message.mp4</pre>
 </main>
 
 <dialog class="media-lightbox" id="proof-lightbox" aria-label="Full-resolution proof image">
+  <div class="lightbox-frame">
   <button class="lightbox-close" type="button" aria-label="Close full-resolution image">×</button>
-  <img src="assets/proof/codex-decoded.webp" alt="">
+    <img src="assets/proof/codex-decoded.webp" alt="">
+  </div>
 </dialog>
 
 <footer class="site-footer">
@@ -1577,11 +1595,16 @@ python decode.py docs/assets/ghost-message.mp4</pre>
   const lightboxClose = lightbox?.querySelector(".lightbox-close");
 
   document.querySelectorAll(".proof-button").forEach((button) => {
-    button.addEventListener("click", () => {
+    button.addEventListener("click", async () => {
       if (!lightbox || !lightboxImage) return;
       const preview = button.querySelector("img");
       lightboxImage.src = button.dataset.image;
       lightboxImage.alt = preview?.alt || "Full-resolution execution proof";
+      try {
+        await lightboxImage.decode();
+      } catch {
+        // The dialog can still display the browser's loaded image fallback.
+      }
       lightbox.showModal();
     });
   });
