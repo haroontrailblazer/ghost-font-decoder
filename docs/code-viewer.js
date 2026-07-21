@@ -479,7 +479,8 @@
   function repositoryFileKind(path) {
     if (/\.(?:png|jpe?g|gif|webp|svg|ico)$/i.test(path)) return "image";
     if (/\.(?:mp4|webm|mov)$/i.test(path)) return "video";
-    if (/\.(?:zip|gz|woff2?|ttf|otf|pdf)$/i.test(path)) return "binary";
+    if (/\.pdf$/i.test(path)) return "pdf";
+    if (/\.(?:zip|gz|woff2?|ttf|otf)$/i.test(path)) return "binary";
     return "text";
   }
 
@@ -559,6 +560,24 @@
           ${kind === "image"
             ? `<img src="${escapeAttribute(url)}" alt="Preview of ${escapeAttribute(filename)}">`
             : `<video src="${escapeAttribute(url)}" controls preload="metadata"></video>`}
+        </div>
+      `;
+      return;
+    }
+
+    if (kind === "pdf") {
+      activeText = "";
+      copyButton.disabled = true;
+      const url = repositoryRawUrl(path);
+      const previewUrl = `https://mozilla.github.io/pdf.js/web/viewer.html?file=${encodeURIComponent(url)}`;
+      panel.innerHTML = `
+        <div class="repo-file-heading">
+          <div class="repo-file-path"><span>${escapeHtml(repositoryDisplayName())}</span><span>/</span><strong>${escapeHtml(path)}</strong></div>
+          <span class="repo-file-lines">PDF preview</span>
+        </div>
+        <div class="repo-pdf-preview">
+          <iframe src="${escapeAttribute(previewUrl)}" title="Preview of ${escapeAttribute(filename)}" loading="eager"></iframe>
+          <a class="repo-pdf-open" href="${escapeAttribute(url)}" target="_blank" rel="noopener">Open PDF directly</a>
         </div>
       `;
       return;

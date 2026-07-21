@@ -456,6 +456,37 @@ details[open] > summary .repo-tree-chevron {
   object-fit: contain;
 }
 
+.repo-pdf-preview {
+  position: relative;
+  height: calc(100% - 46px);
+  min-height: 0;
+  overflow: hidden;
+  background: #e6e8e1;
+}
+
+.repo-pdf-preview iframe {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border: 0;
+}
+
+.repo-pdf-open {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  padding: 9px 12px;
+  border: 1px solid #596054;
+  border-radius: 4px;
+  background: #10130f;
+  color: #d7ff75;
+  font-family: var(--mono, monospace);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
 .markdown-preview {
   max-width: 920px;
   margin: 0 auto;
